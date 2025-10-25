@@ -1,7 +1,6 @@
 import Footer from '@/components/shared/footer';
 // navigation handled via window.location or callback route
 // TODO: replace these IDs with real values from your backend/admin
-const TEMPLATE_ID = 'b6f09e53-204c-43ff-b7cc-63080f886827';
 const PREMIUM_PACKAGE_ID = 'f83dacaf-8777-45fa-899e-77b89ca23bf1';
 import Pricing from '@/assets/pricing.png';
 import Pricing2 from '@/assets/pricing2.png';
