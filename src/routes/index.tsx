@@ -1,5 +1,5 @@
+
 import ScrollToTop from '@/hooks/scroll-to-top';
-import HandlePayment from '@/pages/MemberShip/HandlePayment';
 import NotFound from '@/pages/not-found';
 import { Suspense, lazy } from 'react';
 import { Navigate, Outlet, useRoutes } from 'react-router-dom';
@@ -22,6 +22,7 @@ const QRpayment = lazy(() => import('@/pages/MemberShip/QRpayment'));
 const QRpaymentPro = lazy(() => import('@/pages/MemberShip/QRpaymentpro'));
 const DonePayment = lazy(() => import('@/pages/MemberShip/donepayment'));
 const ErrorPayment = lazy(() => import('@/pages/MemberShip/errorpayment'));
+const PaymentCallback = lazy(() => import('@/pages/MemberShip/payment-callback'));
 const MainResourse = lazy(() => import('@/pages/resourse/main-resourse'));
 const Blog1 = lazy(() => import('@/pages/resourse/blog1'));
 const Blog2 = lazy(() => import('@/pages/resourse/blog2'));
@@ -98,7 +99,11 @@ export default function AppRouter() {
         },
         {
           path: '/membership/done',
-          element: <HandlePayment />
+          element: <DonePayment />
+        },
+        {
+          path: '/membership/payment-callback',
+          element: <PaymentCallback />
         },
         {
           path: '/membership/error',

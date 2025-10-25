@@ -1,3 +1,4 @@
+
 import { api } from '@/config/axios.config';
 import BaseRequest from '@/config/axios.config';
 import { useMutation } from '@tanstack/react-query';
@@ -18,6 +19,13 @@ export const postOrder = (model) => api.post(`/api/Order`, model);
 // payment
 export const postPayment = (model) =>
   api.post(`/api/Payment/create-payment`, model);
+// New PayOS / payment endpoints
+export const postPaymentPremium = (model) =>
+  api.post('api/payment/premium', model);
+export const postPaymentTemplate = (model) =>
+  api.post('api/payment/template', model);
+export const getPaymentsHistory = () => api.get('api/payments');
+export const getPaymentStatus = (orderCode) => api.get(`api/payment/status/${orderCode}`);
 export const getTransactions = (id) => api.get(`/api/Payment/payment/${id}`);
 export const handleTransactions = (id, status) =>
   api.put(`/api/Payment/update-payment-status/${id}?newStatus=${status}`);
