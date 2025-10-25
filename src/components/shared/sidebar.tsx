@@ -13,8 +13,10 @@ import {
   DropdownMenuSeparator
 } from '@/components/ui/dropdown-menu';
 import { logout } from '@/redux/auth.slice';
+import { useLogout } from '@/queries/auth.query';
 import { useGetInfoUser } from '@/queries/auth.query';
 import { useRouter } from '@/routes/hooks';
+import helper from '@/helpers/index';
 
 const NAV_ITEMS = [
   { title: 'Phòng ảo', href: '/virtual-room' },
@@ -25,18 +27,30 @@ const NAV_ITEMS = [
 ];
 
 export default function Sidebar() {
-  const auth = useSelector((state: RootState) => state.auth);
-  const dispatch = useDispatch();
+  // select the full auth slice so we can read auth.isLogin in JSX
   const router = useRouter();
+  const auth = useSelector((state: RootState) => state.auth);
+  const accessToken = helper.cookie_get('AT');
+  const { mutateAsync: logoutAccount } = useLogout();
+  const dispatch = useDispatch();
   const { data: infoUser } = useGetInfoUser();
   const avatar = infoUser?.avatar || infoUser?.profile_picture || null;
+
+  const handleLogout = async () => {
+    await logoutAccount({ accessToken });
+    helper.cookie_delete('RT');
+    helper.cookie_delete('AT');
+    helper.cookie_delete('user');
+    router.push('/');
+    dispatch(logout());
+  }
 
   return (
     <nav className={cn('hidden md:block w-full bg-white')}>
   <div className="relative mx-auto w-[95%] px-5">
         {/* Left - logo */}
         <div className="flex items-center">
-          <Link to="/" className="flex items-center">
+          <Link to="/stayonhome" className="flex items-center">
             <img src={logoImg} alt="logo" className="h-13 w-auto" />
           </Link>
         </div>
@@ -79,12 +93,7 @@ export default function Sidebar() {
                     Membership
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    onClick={() => {
-                      dispatch(logout());
-                      router.push('/');
-                    }}
-                  >
+                  <DropdownMenuItem onClick={() => void handleLogout()}>
                     Logout
                   </DropdownMenuItem>
                 </DropdownMenuContent>

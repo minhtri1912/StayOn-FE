@@ -1,4 +1,5 @@
 import ScrollToTop from '@/hooks/scroll-to-top';
+import HandlePayment from '@/pages/MemberShip/HandlePayment';
 import NotFound from '@/pages/not-found';
 import { Suspense, lazy } from 'react';
 import { Navigate, Outlet, useRoutes } from 'react-router-dom';
@@ -6,6 +7,7 @@ import { Navigate, Outlet, useRoutes } from 'react-router-dom';
 const SystemLayout = lazy(() => import('@/components/layout/layout'));
 const HomePage = lazy(() => import('@/pages/Home/index'));
 const StayOnHome = lazy(() => import('@/pages/MainHome/stayonhome'));
+const DetailTeam = lazy(() => import('@/pages/MainHome/detailteam'));
 const ProfilePage = lazy(() => import('@/pages/ProfilePage/index'));
 const LoginPage = lazy(() => import('@/pages/AuthPage/Login/index'));
 const RegisterPage = lazy(() => import('@/pages/AuthPage/Register/index'));
@@ -16,11 +18,20 @@ const SendSuccess = lazy(() => import('@/pages/ADHDCommunity/SendSuccess'));
 const AboutStayOn = lazy(() => import('@/pages/MainHome/aboutstayon'));
 const ValueStayon = lazy(() => import('@/pages/MainHome/valuestayon'));
 const MemberPricing = lazy(() => import('@/pages/MemberShip/MemberPricing'));
+const QRpayment = lazy(() => import('@/pages/MemberShip/QRpayment'));
+const QRpaymentPro = lazy(() => import('@/pages/MemberShip/QRpaymentpro'));
+const DonePayment = lazy(() => import('@/pages/MemberShip/donepayment'));
+const ErrorPayment = lazy(() => import('@/pages/MemberShip/errorpayment'));
 const MainResourse = lazy(() => import('@/pages/resourse/main-resourse'));
 const Blog1 = lazy(() => import('@/pages/resourse/blog1'));
 const Blog2 = lazy(() => import('@/pages/resourse/blog2'));
 const Blog3 = lazy(() => import('@/pages/resourse/blog3'));
 const Blog4 = lazy(() => import('@/pages/resourse/blog4'));
+const Quiz1 = lazy(() => import('@/pages/resourse/quiz1'));
+const Quiz2 = lazy(() => import('@/pages/resourse/quiz2'));
+const Quiz3 = lazy(() => import('@/pages/resourse/quiz3'));
+const Quiz11 = lazy(() => import('@/pages/resourse/quiz11'));
+const Dapan11 = lazy(() => import('@/pages/resourse/dapan11'));
 
 // ----------------------------------------------------------------------
 
@@ -38,7 +49,7 @@ export default function AppRouter() {
       ),
       children: [
         {
-          element: <StayOnHome />,
+          element: <HomePage />,
           index: true
         },
         {
@@ -66,6 +77,10 @@ export default function AppRouter() {
           element: <AboutStayOn />
         },
         {
+          path: '/team',
+          element: <DetailTeam />
+        },
+        {
           path: '/values',
           element: <ValueStayon />
         },
@@ -74,12 +89,32 @@ export default function AppRouter() {
           element: <MemberPricing />
         },
         {
+          path: '/membership/qrpayment',
+          element: <QRpayment />
+        },
+        {
+          path: '/membership/qrpayment-pro',
+          element: <QRpaymentPro />
+        },
+        {
+          path: '/membership/done',
+          element: <HandlePayment />
+        },
+        {
+          path: '/membership/error',
+          element: <ErrorPayment />
+        },
+        {
           path: '/community',
           element: <ConfessionBox />
         },
         {
           path: '/resources',
           element: <MainResourse />
+        },
+        {
+          path: '/stayonhome',
+          element: <StayOnHome />
         },
         {
           path: '/resources/what-is-adhd',
@@ -96,6 +131,26 @@ export default function AppRouter() {
         {
           path: '/resources/causes',
           element: <Blog4 />
+        },
+        {
+          path: '/resources/quiz1',
+          element: <Quiz1 />
+        },
+        {
+          path: '/resources/quiz2',
+          element: <Quiz2 />
+        },
+        {
+          path: '/resources/quiz3',
+          element: <Quiz3 />
+        },
+        {
+          path: '/resources/quiz11',
+          element: <Quiz11 />
+        },
+        {
+          path: '/resources/dapan11',
+          element: <Dapan11 />
         },
         
         {

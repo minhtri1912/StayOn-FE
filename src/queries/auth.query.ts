@@ -12,6 +12,15 @@ export const useLogin = () => {
   });
 };
 
+export const useLogout = () => {
+  return useMutation({
+    mutationKey: ['logout'],
+    mutationFn: async (model: any) => {
+      return BaseRequest.Post(`/logout`, model);
+    }
+  });
+};
+
 export const useRegister = () => {
   return useMutation({
     mutationKey: ['register'],

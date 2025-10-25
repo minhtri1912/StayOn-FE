@@ -1,6 +1,7 @@
 import ContactTitle from '@/assets/contact.png';
-import ContactIcons from '@/assets/contact2.png';
 import Footer from '@/components/shared/footer';
+import { Instagram, Linkedin, Youtube, Facebook } from 'lucide-react';
+import { Icons } from '@/components/ui/icons';
 
 export default function ContactPage() {
 	return (
@@ -37,12 +38,24 @@ export default function ContactPage() {
 				</section>
 
 				{/* Bottom icons strip: contact2.png */}
-				<div className="mt-6 md:mt-8 flex justify-center">
-					<img
-						src={ContactIcons}
-						alt="Mạng xã hội"
-						className="h-10 md:h-12 w-auto select-none pointer-events-none"
-					/>
+				<div className="mt-6 md:mt-4 flex justify-center">
+					<div className="flex gap-11 mt-8">
+						<a href="https://facebook.com/stayon" target="_blank" rel="noopener noreferrer" className="h-12 w-12 md:h-14 md:w-14 rounded-md bg-[#eaf387] flex items-center justify-center border-2 border-black">
+									<Facebook className="h-6 w-6 md:h-7 md:w-7 text-black" />
+								</a>
+								<a href="https://twitter.com/stayon" target="_blank" rel="noopener noreferrer" className="h-12 w-12 md:h-14 md:w-14 rounded-md bg-[#eaf387] flex items-center justify-center border-2 border-black">
+									<Icons.twitter className="h-6 w-6 md:h-7 md:w-7 text-black" />
+								</a>
+								<a href="https://instagram.com/stayon" target="_blank" rel="noopener noreferrer" className="h-12 w-12 md:h-14 md:w-14 rounded-md bg-[#eaf387] flex items-center justify-center border-2 border-black">
+									<Instagram className="h-6 w-6 md:h-7 md:w-7 text-black" />
+								</a>
+								<a href="https://linkedin.com/company/stayon" target="_blank" rel="noopener noreferrer" className="h-12 w-12 md:h-14 md:w-14 rounded-md bg-[#eaf387] flex items-center justify-center border-2 border-black">
+									<Linkedin className="h-6 w-6 md:h-7 md:w-7 text-black" />
+								</a>
+								<a href="https://youtube.com/@stayon" target="_blank" rel="noopener noreferrer" className="h-12 w-12 md:h-14 md:w-14 rounded-md bg-[#eaf387] flex items-center justify-center border-2 border-black">
+									<Youtube className="h-6 w-6 md:h-7 md:w-7 text-black" />
+								</a>
+					</div>
 				</div>
 			</div>
 			<footer className="w-full mt-10 md:mt-14">

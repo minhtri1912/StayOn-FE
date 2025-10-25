@@ -1,6 +1,7 @@
 import BasePages from '@/components/shared/base-pages.js';
 import Footer from '@/components/shared/footer';
 import Ecology from '@/assets/ecology.png';
+import { Link } from 'react-router-dom';
 
 export default function ShopPage() {
   return (
@@ -20,9 +21,9 @@ export default function ShopPage() {
               </h1>
 
               <div className="mt-6 flex justify-center">
-                <button
-                  type="button"
-                  className="inline-flex items-center gap-3 bg-black text-white rounded-full px-6 py-3 md:px-8 md:py-4 shadow-md hover:opacity-95"
+                <Link
+                  to="/login"
+                  className="inline-flex items-center gap-3 bg-black text-white rounded-full px-6 py-3 md:px-8 md:py-4 shadow-md hover:opacity-95transition transform hover:-translate-y-1 hover:scale-120 hover:shadow-xl"
                 >
                   <span className="text-sm md:text-base">Bắt đầu khám phá</span>
                   <svg
@@ -34,13 +35,13 @@ export default function ShopPage() {
                   >
                     <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M12 5l7 7-7 7" />
                   </svg>
-                </button>
+                </Link>
               </div>
             </div>
           </div>
 
           {/* Illustration */}
-          <div className="mt-1 flex flex-col items-center relative">
+          <div className="mt-[-60px] flex flex-col items-center relative">
             <img src={Ecology} alt="ecology" className="w-30 md:w-100" />
 
     

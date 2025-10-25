@@ -31,7 +31,7 @@ export default function LoginPage() {
     var token = helper.cookie_get('AT');
     if (token) {
       dispatch(login());
-      window.location.href = '/';
+      window.location.href = '/stayonhome';
     }
   }, []);
 
@@ -63,12 +63,12 @@ export default function LoginPage() {
       if (body) {
         helper.cookie_set('AT', body.token);
         dispatch(login());
-        // navigate to the logged-in home page
+        // navigate to the logged-in home page (StayOnHome)
         try {
-          router.push('/main-home');
+          router.push('/stayonhome');
         } catch (e) {
           // fallback
-          window.location.href = '/';
+          window.location.href = '/stayonhome';
         }
       }
     } catch (err) {

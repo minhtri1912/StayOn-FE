@@ -26,6 +26,7 @@ const onResponseError = (error: any) => {
 axios.interceptors.request.use(onRequestSuccess, onRequestError);
 axios.interceptors.response.use(onResponseSuccess, onResponseError);
 axios.defaults.baseURL = baseURL;
+export const api = axios;
 
 var BaseRequest = {
   Get: async (url: string) => {
@@ -47,6 +48,15 @@ var BaseRequest = {
   Post2: async (url: string, data?: any) => {
     try {
       const response = await axios.post<any>(url, data);
+      return response;
+    } catch (err) {
+      console.log('err', err);
+    }
+  },
+  PostWithOutResponse: async (url: string, data?: any) => {
+    try {
+      const response = await axios.post<any>(url, data);
+      console.log('response', response);
       return response;
     } catch (err) {
       console.log('err', err);
