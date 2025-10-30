@@ -1,0 +1,54 @@
+{
+  "tracks": [
+    {
+      "id": "1",
+      "title": "Perfect Rain Sounds for Sleep",
+      "artist": "Relaxing White Noise",
+      "url": "https://soundcloud.com/relaxing-white-noise/perfect-rain-sounds-for-sleep",
+      "trackId": "9196ece113a647c18266f57b5088de10",
+      "duration": "8:00:00",
+      "category": "nature",
+      "description": "Perfect rain sounds for sleep and deep focus"
+    },
+    {
+      "id": "2",
+      "title": "Lo-fi Chill Mix",
+      "artist": "User 636346752",
+      "url": "https://soundcloud.com/user-636346752/sets/lofi-chill",
+      "trackId": "b91d8e7ea05f4addaebc92e1d95dc4b5",
+      "duration": "1:00:00",
+      "category": "lofi",
+      "description": "Chill lo-fi beats for relaxation and focus"
+    },
+    {
+      "id": "3",
+      "title": "Lo-fi Music for Studying",
+      "artist": "User 929712017",
+      "url": "https://soundcloud.com/user929712017/sets/lofi-music-for-studying",
+      "trackId": "0cee1521a07746c585e997a914ff20cf",
+      "duration": "1:30:00",
+      "category": "study",
+      "description": "Perfect lo-fi music for studying and concentration"
+    },
+    {
+      "id": "4",
+      "title": "Lo-fi Hip Hop Mix",
+      "artist": "Zezepaak",
+      "url": "https://soundcloud.com/zezepaak/sets/lofi_hiphop_mix",
+      "trackId": "f318cc89734846189545ea936a0ed785",
+      "duration": "2:00:00",
+      "category": "lofi",
+      "description": "Smooth lo-fi hip hop mix for focus and productivity"
+    },
+    {
+      "id": "5",
+      "title": "Anime Lo-fi Collection",
+      "artist": "Aditya Debnath",
+      "url": "https://soundcloud.com/aditya-debnath-492798816/sets/anime-lofi",
+      "trackId": "e4c47c64eeb540479628352c21777a6a",
+      "duration": "1:45:00",
+      "category": "anime-lofi",
+      "description": "Beautiful anime-inspired lo-fi music for deep focus"
+    }
+  ]
+}

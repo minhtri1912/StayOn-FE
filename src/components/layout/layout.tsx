@@ -3,6 +3,7 @@ import MobileSidebar from '../shared/mobile-sidebar';
 import helper from '@/helpers/index';
 import { login } from '@/redux/auth.slice';
 import { useEffect, useLayoutEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Toaster } from '@/components/ui/toaster';
 import { useDispatch } from 'react-redux';
 import { updateCart, updateTotalItems } from '@/redux/cart.slice';
@@ -13,6 +14,7 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
   const { mutateAsync: getOrderByStatus } = useGetOrderUserByStatus();
 
@@ -53,6 +55,16 @@ export default function DashboardLayout({
     document.addEventListener('click', onDocClick);
     return () => document.removeEventListener('click', onDocClick);
   }, []);
+
+  // Fullscreen mode for Virtual Room: hide global navigation/sidebar
+  if (location.pathname.startsWith('/virtual-room')) {
+    return (
+      <div className="flex h-screen flex-col overflow-hidden bg-background">
+        <main className="flex-1 overflow-hidden">{children}</main>
+        <Toaster />
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-screen flex-col overflow-hidden bg-background ">
