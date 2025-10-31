@@ -959,16 +959,47 @@ export default function ActivitiesSummaryModal({
                 justifyContent: 'space-between'
               }}
             >
-              <h2
-                style={{
-                  color: 'white',
-                  fontSize: '20px',
-                  fontWeight: '600',
-                  margin: 0
-                }}
+              <div
+                style={{ display: 'flex', alignItems: 'center', gap: '12px' }}
               >
-                📊 Session Details
-              </h2>
+                <button
+                  onClick={() => setShowSessionDetailModal(false)}
+                  style={{
+                    padding: '8px 12px',
+                    borderRadius: '8px',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                    color: 'white',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor =
+                      'rgba(255, 255, 255, 0.2)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor =
+                      'rgba(255, 255, 255, 0.1)';
+                  }}
+                >
+                  ← Quay lại
+                </button>
+                <h2
+                  style={{
+                    color: 'white',
+                    fontSize: '20px',
+                    fontWeight: '600',
+                    margin: 0
+                  }}
+                >
+                  📊 Session Details
+                </h2>
+              </div>
               <button
                 onClick={() => setShowSessionDetailModal(false)}
                 style={{

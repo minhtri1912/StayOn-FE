@@ -530,7 +530,30 @@ function PomodoroPage() {
 
   // Pause (toggle running state)
   const handlePause = () => {
-    setPomodoroRunning(!pomodoroRunning);
+    if (isExternalTracker) {
+      // Nếu đang dùng AI tracking → Pause/Resume timer + Pause/Resume camera + Dừng/Tiếp tục data
+      const newState = !pomodoroRunning;
+      setPomodoroRunning(newState);
+      // Gửi message pause/resume camera trong tracker window
+      const messageType = newState ? 'RESUME_TRACKING' : 'PAUSE_TRACKING';
+      try {
+        trackerBCRef.current?.postMessage({ type: messageType });
+      } catch (err) {
+        console.error('BC send tracking error:', err);
+      }
+      try {
+        trackerPort?.postMessage({ type: messageType });
+      } catch (err) {
+        console.error('Port send tracking error:', err);
+      }
+      // Gửi qua window message nếu là popup
+      if (window.postMessage) {
+        window.postMessage({ type: messageType }, '*');
+      }
+    } else {
+      // Mode bình thường → chỉ pause timer
+      setPomodoroRunning(!pomodoroRunning);
+    }
   };
 
   // End session (stop tracking + reset)

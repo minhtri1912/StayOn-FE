@@ -6,7 +6,15 @@ import {
   useEffect
 } from 'react';
 import helpers from '@/helpers';
-import { Send, X, Paperclip, FileText, Trash2, Sparkles } from 'lucide-react';
+import {
+  Send,
+  X,
+  Paperclip,
+  FileText,
+  Trash2,
+  Sparkles,
+  Home
+} from 'lucide-react';
 
 const ChatDrawer = forwardRef(function ChatDrawer({ open, onClose }, ref) {
   const [msgs, setMsgs] = useState([]);
@@ -237,11 +245,41 @@ const ChatDrawer = forwardRef(function ChatDrawer({ open, onClose }, ref) {
     }
   };
 
-  // Expose quickAsk method via ref
+  // Reset chat về trạng thái ban đầu
+  const resetChat = () => {
+    setMsgs([]);
+    setShowSessionSelector(false);
+    setLoading(false);
+  };
+
+  // Clean markdown formatting từ AI responses
+  const cleanMarkdown = (text) => {
+    if (!text || typeof text !== 'string') return text;
+
+    // Replace <br> tags with newlines
+    let cleaned = text.replace(/<br\s*\/?>/gi, '\n');
+
+    // Remove markdown formatting
+    cleaned = cleaned
+      .replace(/\*\*(.*?)\*\*/g, '$1') // Bold
+      .replace(/\*(.*?)\*/g, '$1') // Italic
+      .replace(/`(.*?)`/g, '$1') // Code
+      .replace(/#{1,6}\s*(.*)/g, '$1') // Headers
+      .replace(/\|/g, ' ') // Table separators
+      .replace(/-{3,}/g, '') // Horizontal rules
+      .replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1') // Links
+      .replace(/\n{3,}/g, '\n\n') // Multiple newlines
+      .trim();
+
+    return cleaned;
+  };
+
+  // Expose quickAsk và analyzeSession methods via ref
   useImperativeHandle(
     ref,
     () => ({
-      quickAsk: (q) => ask(q)
+      quickAsk: (q) => ask(q),
+      analyzeSession: (sessionId) => analyzeSession(sessionId)
     }),
     []
   );
@@ -376,33 +414,65 @@ const ChatDrawer = forwardRef(function ChatDrawer({ open, onClose }, ref) {
             </p>
           </div>
         </div>
-        <button
-          onClick={onClose}
-          style={{
-            width: '32px',
-            height: '32px',
-            borderRadius: '8px',
-            border: 'none',
-            background: 'rgba(255, 255, 255, 0.08)',
-            color: 'rgba(255, 255, 255, 0.6)',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            transition: 'all 0.2s'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)';
-            e.currentTarget.style.color = 'white';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)';
-            e.currentTarget.style.color = 'rgba(255, 255, 255, 0.6)';
-          }}
-          title="Close chat"
-        >
-          <X size={18} />
-        </button>
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          {/* Nút Home - chỉ hiển thị khi có messages */}
+          {msgs.length > 0 && (
+            <button
+              onClick={resetChat}
+              style={{
+                width: '32px',
+                height: '32px',
+                borderRadius: '8px',
+                border: 'none',
+                background: 'rgba(255, 255, 255, 0.08)',
+                color: 'rgba(255, 255, 255, 0.6)',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'all 0.2s'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)';
+                e.currentTarget.style.color = 'white';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)';
+                e.currentTarget.style.color = 'rgba(255, 255, 255, 0.6)';
+              }}
+              title="Màn hình chính"
+            >
+              <Home size={18} />
+            </button>
+          )}
+          <button
+            onClick={onClose}
+            style={{
+              width: '32px',
+              height: '32px',
+              borderRadius: '8px',
+              border: 'none',
+              background: 'rgba(255, 255, 255, 0.08)',
+              color: 'rgba(255, 255, 255, 0.6)',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'all 0.2s'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)';
+              e.currentTarget.style.color = 'white';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)';
+              e.currentTarget.style.color = 'rgba(255, 255, 255, 0.6)';
+            }}
+            title="Close chat"
+          >
+            <X size={18} />
+          </button>
+        </div>
       </header>
 
       {/* Session Selector Modal */}
@@ -755,7 +825,7 @@ const ChatDrawer = forwardRef(function ChatDrawer({ open, onClose }, ref) {
                     m.role === 'user' ? 'white' : 'rgba(255, 255, 255, 0.95)'
                 }}
               >
-                {m.text}
+                {m.role === 'assistant' ? cleanMarkdown(m.text) : m.text}
               </p>
               <p
                 style={{
