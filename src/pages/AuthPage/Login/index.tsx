@@ -84,7 +84,6 @@ export default function LoginPage() {
         pageHead="Đăng nhập | Stay On"
       >
         {/* Top banner (Xin chao) */}
-<<<<<<< HEAD
         <div className="mx-auto w-max my-2">
           <img src={XinChao} alt="xin chao" className="block w-auto max-w-xl object-contain" />
         </div>
@@ -92,19 +91,6 @@ export default function LoginPage() {
         {/* Center rounded card */}
         <div className="w-full flex justify-center py-10 md:py-4">
           <div className="w-full max-w-2xl rounded-3xl border-2 border-black p-10 md:p-14 bg-white">
-=======
-        <div className="mx-auto my-8 w-max">
-          <img
-            src={XinChao}
-            alt="xin chao"
-            className="block w-auto max-w-xl object-contain"
-          />
-        </div>
-
-        {/* Center rounded card */}
-        <div className="flex w-full justify-center py-10 md:py-16">
-          <div className="w-full max-w-2xl rounded-3xl border-2 border-black bg-white p-10 md:p-14">
->>>>>>> e7cd34e4292748dee2f6d5f504460375570e8e5a
             <div className="text-center">
               <h2 className="text-3xl font-extrabold uppercase md:text-4xl">
                 Đăng nhập
