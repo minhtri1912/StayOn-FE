@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils';
 import { Icons } from '@/components/ui/icons';
 import { Link } from 'react-router-dom';
-import logoImg from '@/assets/logo 1.png';
+import logoImg from '@/assets/logostayon.png';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/redux/store';
 import { Button } from '@/components/ui/button';
@@ -46,23 +46,23 @@ export default function Sidebar() {
   }
 
   return (
-    <nav className={cn('hidden md:block w-full bg-white')}>
+  <nav className={cn('hidden md:block w-full bg-white border-b border-gray-200')}>
   <div className="relative mx-auto w-[95%] px-5">
         {/* Left - logo */}
         <div className="flex items-center">
           <Link to="/stayonhome" className="flex items-center">
-            <img src={logoImg} alt="logo" className="h-13 w-auto" />
+            <img src={logoImg} alt="StayOn logo" className="h-10 md:h-20 w-auto" />
           </Link>
         </div>
 
         {/* Center - navigation (absolutely centered) */}
         <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
-          <div className="flex justify-between w-[780px]">
+         <div className="flex justify-between w-[780px]">
             {NAV_ITEMS.map((item) => (
               <Link
                 key={item.title}
                 to={item.href}
-                className="px-2 py-1 text-[15px] font-medium uppercase tracking-wide hover:text-black text-gray-900"
+                className="px-[-10] py-1 text-[16px] font-medium uppercase tracking-wide hover:text-black text-gray-900"
               >
                 {item.title}
               </Link>
@@ -71,17 +71,31 @@ export default function Sidebar() {
         </div>
 
         {/* Right - auth (anchored to right) */}
-        <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+        <div className="absolute right-12 top-1/2 transform -translate-y-1/2">
           <div className="flex items-center gap-4">
             {auth.isLogin ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="rounded-full bg-gray-200 p-0.5">
+                      <button className="rounded-full bg-gray-200 p-0.5">
                         {avatar ? (
                           // eslint-disable-next-line @next/next/no-img-element
                           <img src={avatar} alt="avatar" className="h-8 w-8 rounded-full object-cover" />
                         ) : (
-                          <Icons.user className="size-5 p-1" />
+                          <svg
+                            aria-hidden="true"
+                            focusable="false"
+                            className="h-8 w-8 text-black"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            {/* outer circle (black) */}
+                            <circle cx="12" cy="12" r="11" fill="currentColor" />
+                            {/* head (white) */}
+                            <circle cx="12" cy="8.8" r="2.6" fill="#ffffff" />
+                            {/* torso / shoulders (white oval) */}
+                            <ellipse cx="12" cy="16" rx="5.2" ry="3" fill="#ffffff" />
+                          </svg>
                         )}
                       </button>
                 </DropdownMenuTrigger>

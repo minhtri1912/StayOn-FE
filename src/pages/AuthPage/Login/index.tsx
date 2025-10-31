@@ -84,12 +84,12 @@ export default function LoginPage() {
       >
 
         {/* Top banner (Xin chao) */}
-        <div className="mx-auto w-max my-8">
+        <div className="mx-auto w-max my-2">
           <img src={XinChao} alt="xin chao" className="block w-auto max-w-xl object-contain" />
         </div>
 
         {/* Center rounded card */}
-        <div className="w-full flex justify-center py-10 md:py-16">
+        <div className="w-full flex justify-center py-10 md:py-4">
           <div className="w-full max-w-2xl rounded-3xl border-2 border-black p-10 md:p-14 bg-white">
             <div className="text-center">
               <h2 className="text-3xl md:text-4xl font-extrabold uppercase">Đăng nhập</h2>

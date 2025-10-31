@@ -58,7 +58,7 @@ export default function MainResourse() {
 
           <div className="w-full flex justify-end mt-0 transform -translate-y-24 -translate-x-20">
             <Link
-              to="/resources/todo"
+              to="/resources/cornell"
               className="inline-flex items-center gap-3 bg-white text-black rounded-full px-6 py-2 font-medium shadow-md border-2 border-black transition transform hover:-translate-y-1 hover:scale-120 hover:shadow-xl"
             >
               Khám phá
@@ -68,7 +68,7 @@ export default function MainResourse() {
 
           <div className="w-full flex justify-end mt-0 transform -translate-y-[540px] -translate-x-20">
             <Link
-              to="/resources/todo"
+              to="/resources/todolist"
               className="inline-flex items-center gap-3 bg-white text-black rounded-full px-6 py-2 font-medium shadow-md border-2 border-black transition transform hover:-translate-y-1 hover:scale-120 hover:shadow-xl"
             >
               Khám phá
@@ -77,7 +77,7 @@ export default function MainResourse() {
           </div>
           <div className="w-full flex justify-end mt-0 transform -translate-y-[190px] -translate-x-[470px]">
             <Link
-              to="/resources/todo"
+              to="/resources/matrix"
               className="inline-flex items-center gap-3 bg-white text-black rounded-full px-6 py-2 font-medium shadow-md border-2 border-black transition transform hover:-translate-y-1 hover:scale-120 hover:shadow-xl"
             >
               Khám phá
@@ -86,7 +86,7 @@ export default function MainResourse() {
           </div>
              <div className="w-full flex justify-end mt-0 transform -translate-y-[235px] -translate-x-[850px]">
             <Link
-              to="/resources/todo"
+              to="/resources/planners"
               className="inline-flex items-center gap-3 bg-white text-black rounded-full px-6 py-2 font-medium shadow-md border-2 border-black transition transform hover:-translate-y-1 hover:scale-120 hover:shadow-xl"
             >
               Khám phá
@@ -97,7 +97,7 @@ export default function MainResourse() {
       </section>
 
       {/* Section 4 - s4res image */}
-      <section className="w-full py-12 bg-white flex items-center justify-center">
+      <section className="w-full py-0 bg-white flex items-center justify-center">
           <div className="relative max-w-full w-[1550px] reveal reveal-delay-600">
           <img src={s4res} alt="Tài nguyên - section 4" className="max-w-full w-full h-auto object-contain float-slow" />
 

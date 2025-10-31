@@ -1,117 +1,108 @@
-import BasePages from '@/components/shared/base-pages.js';
 import Footer from '@/components/shared/footer';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Icons } from '@/components/ui/icons';
-import { useGetInfoUser } from '@/queries/auth.query';
-import { useState } from 'react';
-import Order from './Order';
-import helper from '@/helpers/index';
-const ListMenu = [
-  {
-    id: 1,
-    title: 'Thông tin cá nhân',
-    icon: 'profile'
-  },
-  {
-    id: 3,
-    title: 'Đơn hàng',
-    icon: 'truck'
-  },
-  {
-    id: 4,
-    title: 'Đăng xuất',
-    icon: 'logOut'
-  }
-];
+import thongtinImg from '@/assets/thongtincanhan.png';
 
 export default function ProfilePage() {
-  const [selectedMenu, setSelectedMenu] = useState(1);
-  const { data: infoUser } = useGetInfoUser();
-  const { firstName, lastName, email, phoneNumber } = infoUser || {};
-
-  console.log(infoUser);
-  const _renderMenu = () => {
-    switch (selectedMenu) {
-      case 1:
-        return (
-          <>
-            {' '}
-            <h1 className="mb-[2%] text-lg font-bold">Thông tin cá nhân</h1>
-            <div className="grid grid-cols-4">
-              <div className="flex flex-col">
-                <h1>Họ và tên</h1>
-                <p className="flex font-normal">{`${firstName} ${lastName}`}</p>
-              </div>
-              <div className="flex flex-col">
-                <h1>Tài khoản</h1>
-                <p className="flex font-normal">{`${email}`}</p>
-              </div>
-              <div className="flex flex-col">
-                <h1>Email</h1>
-                <p className="flex font-normal">{`${email}`}</p>
-              </div>
-              <div className="flex flex-col">
-                <h1>Số điện thoại</h1>
-                <p className="flex font-normal">{`${phoneNumber}`}</p>
-              </div>
-            </div>
-          </>
-        );
-      case 3:
-        return <Order />;
-      case 4:
-        helper.cookie_delete('AT');
-        window.location.href = '/login';
-        return <h1>Đăng xuất</h1>;
-      default:
-        return <h1>Thông tin cá nhân</h1>;
-    }
-  };
-
   return (
-    <>
-      <BasePages
-        className="relative mx-auto max-h-screen w-[80%] flex-1  p-4"
-        pageHead="Giỏ hàng | G-Local"
-        breadcrumbs={[
-          { title: 'Trang chủ', link: '/' },
-          { title: 'Profile', link: '/profile' }
-        ]}
-      >
-        <div className="mt-2 grid h-full grid-cols-[30%,65%] gap-10">
-          <div className="space-y-4 rounded-xl bg-background  p-4">
-            <div className="flex items-center gap-4">
-              <Avatar>
-                <AvatarImage
-                  src="https://github.com/shadcn.png"
-                  alt="@shadcn"
-                />
-                <AvatarFallback>CN</AvatarFallback>
-              </Avatar>
-              <h1 className="text-[20px] font-bold">Châu Nguyễn</h1>
-            </div>
-            {ListMenu.map((item) => {
-              const Icon = Icons[item.icon || 'arrowRight'];
-              return (
-                <div
-                  key={item.id}
-                  onClick={() => setSelectedMenu(item.id)}
-                  className={`cursor-pointer rounded-md p-3 ${
-                    selectedMenu === item.id ? 'bg-yellow' : 'bg-background'
-                  }`}
-                >
-                  <h1 className="flex items-center gap-2">
-                    <Icon className="size-5" />
-                    {item.title}
-                  </h1>
+    <div className="min-h-screen bg-white flex flex-col items-center p-6">
+      {/* Centered profile image at the very top */}
+      <div className="w-full flex justify-center mb-6">
+        <img src={thongtinImg} alt="Thông tin cá nhân" className="w-full max-w-2xl mx-auto object-contain" />
+      </div>
+
+      <div className="w-full max-w-6xl">
+        <div className="bg-white border rounded-xl shadow-sm overflow-hidden">
+          {/* Top banner */}
+          <div className="h-28 bg-[#eaf387] md:bg-[#e6f567]" />
+
+          {/* Content area */}
+          <div className="p-8 md:p-12">
+            {/* Header row: avatar + name/email and edit button */}
+            <div className="relative mb-8">
+              <div className="flex items-center">
+                <div className="flex items-center gap-4">
+                  <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-gradient-to-br from-pink-200 to-pink-400 flex items-center justify-center text-white font-bold text-xl md:text-2xl">
+                    LT
+                  </div>
+                  <div>
+                    <div className="text-lg md:text-xl font-semibold">Lan Trinh</div>
+                    <div className="text-sm text-gray-500">lantrinh1208@yahoo.com</div>
+                  </div>
                 </div>
-              );
-            })}
+              </div>
+
+              <div className="absolute right-0 top-0">
+                <button className="bg-blue-500 text-white px-4 py-2 rounded-md text-sm md:text-base">Chỉnh sửa</button>
+              </div>
+            </div>
+
+            {/* Form fields */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm text-gray-600 mb-2">Họ và tên</label>
+                <input
+                  className="w-full bg-gray-50 border border-gray-200 rounded-md px-3 py-3 text-sm"
+                  placeholder="Nhập tên của bạn"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm text-gray-600 mb-2">Biệt danh</label>
+                <input
+                  className="w-full bg-gray-50 border border-gray-200 rounded-md px-3 py-3 text-sm"
+                  placeholder="Nhập tên của bạn"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm text-gray-600 mb-2">Giới Tính</label>
+                <select className="w-full bg-gray-50 border border-gray-200 rounded-md px-3 py-3 text-sm">
+                  <option>Chọn giới tính của bạn</option>
+                  <option>Nam</option>
+                  <option>Nữ</option>
+                  <option>Khác</option>
+                </select>
+              </div>
+
+              <div>
+                
+              </div>
+            </div>
+
+            {/* Emails and intro row */}
+            <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <div className="text-sm font-medium mb-4">Địa chỉ Email:</div>
+                <div className="flex flex-col gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center">@
+                    </div>
+                    <div className="text-sm text-gray-700">lantrinh1208@yahoo.com</div>
+                  </div>
+
+                  <button className="text-sm text-blue-600">+Thêm địa chỉ mail</button>
+                </div>
+              </div>
+
+              <div>
+                <div className="text-sm font-medium mb-2">Lời giới thiệu:</div>
+                <textarea
+                  rows={8}
+                  className="w-full border border-gray-300 rounded-md p-4 text-sm"
+                  defaultValue={"Heluuu, mình là Lan Chinh 👋\nMình là thành viên của Stay On từ đầu tháng 10.\nRất vui được cùng mọi người học hỏi và sáng tạo chung trong nhóm này! ✨"}
+                />
+              </div>
+            </div>
           </div>
-          <div className="rounded-xl bg-background  p-4">{_renderMenu()}</div>
         </div>
-        <Footer />
-      </BasePages>
-    </>
+      </div>
+
+      {/* Spacer to push footer further down, then full-bleed footer */}
+      <div className="h-16 md:h-1" />
+      <div className="w-full mt-auto">
+        <div className="w-screen -mx-6">
+          <Footer />
+        </div>
+      </div>
+    </div>
   );
 }

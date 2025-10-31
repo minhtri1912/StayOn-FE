@@ -68,7 +68,7 @@ export default function ConfessionBox() {
 				</ol>
 
 				<div className="mt-10">
-					<Link to="/community/send" className="inline-flex items-center gap-2 rounded-full bg-black text-white px-6 md:px-7 py-3 font-semibold shadow hover:bg-gray-900">
+					<Link to="/community/send" className="inline-flex items-center gap-2 rounded-full bg-black text-white px-6 md:px-7 py-3 font-semibold shadow hover:bg-gray-900 transition transform hover:-translate-y-1 hover:scale-120 hover:shadow-xl">
 						Tiếp tục gửi confession
 						<span aria-hidden>→</span>
 					</Link>
