@@ -1,0 +1,65 @@
+{
+  "backgrounds": [
+    {
+      "id": "tree-vintage",
+      "name": "Tree Vintage",
+      "type": "video",
+      "thumbnail": "https://res.cloudinary.com/dvcilbfz7/image/upload/v1761319862/background-images/background-images/3af3d1c3-7a63-49e2-8588-7a5e646bafe7_vintagetree.jpg",
+      "url": "https://res.cloudinary.com/dvcilbfz7/video/upload/v1761319553/background-videos/background-videos/8d361027-1203-486e-9507-db910b1765a4_treevintage.mp4",
+      "category": "motion",
+      "description": "Vintage Jungle"
+    },
+    {
+      "id": "Sea-Vintage",
+      "name": "Sea Vintage",
+      "type": "video",
+      "thumbnail": "https://res.cloudinary.com/dvcilbfz7/image/upload/v1761320048/background-images/background-images/42fa99be-ec6c-426a-9e93-6a25d9a73656_seevintage.jpg",
+      "url": "https://res.cloudinary.com/dvcilbfz7/video/upload/v1761319913/background-videos/background-videos/8d6bb50f-31f5-4cc6-b7d5-74ae2d85f667_vintage.mp4",
+      "category": "motion",
+      "description": "Vintage Sea With Friends"
+    },
+    {
+      "id": "beach-waves",
+      "name": "Beach Waves",
+      "type": "video",
+      "thumbnail": "https://res.cloudinary.com/dvcilbfz7/image/upload/v1761320348/background-images/background-images/b1d738cc-9962-4353-9bf3-5d3236b6c34c_hoanghon.jpg",
+      "url": "https://res.cloudinary.com/dvcilbfz7/video/upload/v1761320290/background-videos/background-videos/c9371486-9531-4797-a5c6-eb181e046879_hoanghon.mp4",
+      "category": "motion",
+      "description": "Gentle ocean waves"
+    },
+    {
+      "id": "snow-mountain",
+      "name": "Snow Mountain",
+      "type": "video",
+      "thumbnail": "https://res.cloudinary.com/dvcilbfz7/image/upload/v1761320453/background-images/background-images/963e5a4e-0222-4a98-a1b0-8434fdf44e4a_mountain.jpg",
+      "url": "https://res.cloudinary.com/dvcilbfz7/video/upload/v1761320391/background-videos/background-videos/b9e94702-dea8-4c0f-9fc8-7d1e4a57d322_mountain.mp4",
+      "category": "motion",
+      "description": "Snow Mountain "
+    },
+    {
+      "id": "Sea",
+      "name": "Sea",
+      "type": "video",
+      "thumbnail": "https://res.cloudinary.com/dvcilbfz7/image/upload/v1761320619/background-images/background-images/e9ad2473-8d59-414c-8567-8c209fea407d_SEA.jpg",
+      "url": "https://res.cloudinary.com/dvcilbfz7/video/upload/v1761320595/background-videos/background-videos/27ef2542-2b44-481f-a7fd-9e045dc03199_sea.mp4",
+      "category": "motion",
+      "description": "Sea"
+    },
+    {
+      "id": "Mountain",
+      "name": "Mountain",
+      "type": "image",
+      "url": "https://res.cloudinary.com/dvcilbfz7/image/upload/v1761320783/background-images/background-images/1edc6758-c840-4c63-bec1-908769d69cc2_Mountain %282%29.jpg",
+      "category": "stills",
+      "description": "Mountain"
+    },
+    {
+      "id": "Work",
+      "name": "Work",
+      "type": "image",
+      "url": "https://res.cloudinary.com/dvcilbfz7/image/upload/v1761320864/background-images/background-images/d90e6fe5-46f8-44cc-8613-3300158201fb_Work.jpg",
+      "category": "stills",
+      "description": "Work"
+    }
+  ]
+}

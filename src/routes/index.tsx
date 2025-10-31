@@ -1,4 +1,3 @@
-
 import ScrollToTop from '@/hooks/scroll-to-top';
 import NotFound from '@/pages/not-found';
 import { Suspense, lazy } from 'react';
@@ -11,9 +10,11 @@ const DetailTeam = lazy(() => import('@/pages/MainHome/detailteam'));
 const ProfilePage = lazy(() => import('@/pages/ProfilePage/index'));
 const LoginPage = lazy(() => import('@/pages/AuthPage/Login/index'));
 const RegisterPage = lazy(() => import('@/pages/AuthPage/Register/index'));
-const ContactPage = lazy(() => import('@/pages/Contact/contact')); 
+const ContactPage = lazy(() => import('@/pages/Contact/contact'));
 const ConfessionBox = lazy(() => import('@/pages/ADHDCommunity/ConfessionBox'));
-const SendConfession = lazy(() => import('@/pages/ADHDCommunity/SendConfession'));
+const SendConfession = lazy(
+  () => import('@/pages/ADHDCommunity/SendConfession')
+);
 const SendSuccess = lazy(() => import('@/pages/ADHDCommunity/SendSuccess'));
 const AboutStayOn = lazy(() => import('@/pages/MainHome/aboutstayon'));
 const ValueStayon = lazy(() => import('@/pages/MainHome/valuestayon'));
@@ -22,11 +23,15 @@ const QRpayment = lazy(() => import('@/pages/MemberShip/QRpayment'));
 const QRpaymentPro = lazy(() => import('@/pages/MemberShip/QRpaymentpro'));
 const DonePayment = lazy(() => import('@/pages/MemberShip/donepayment'));
 const ErrorPayment = lazy(() => import('@/pages/MemberShip/errorpayment'));
-const PaymentCallback = lazy(() => import('@/pages/MemberShip/payment-callback'));
+const PaymentCallback = lazy(
+  () => import('@/pages/MemberShip/payment-callback')
+);
 const MainResourse = lazy(() => import('@/pages/resourse/main-resourse'));
 const Blog1 = lazy(() => import('@/pages/resourse/blog1'));
 const Blog2 = lazy(() => import('@/pages/resourse/blog2'));
 const Blog3 = lazy(() => import('@/pages/resourse/blog3'));
+const VirtualRoomPage = lazy(() => import('@/pages/VirtualRoom'));
+const TrackerShell = lazy(() => import('@/virtual-room/pages/TrackerShell'));
 const Blog4 = lazy(() => import('@/pages/resourse/blog4'));
 const Quiz1 = lazy(() => import('@/pages/resourse/quiz1'));
 const Quiz2 = lazy(() => import('@/pages/resourse/quiz2'));
@@ -89,6 +94,11 @@ export default function AppRouter() {
           element: <HomePage />,
           index: true
         },
+        {
+          path: '/virtual-room',
+          element: <VirtualRoomPage />
+        },
+        // keep /vr-tracker out of SystemLayout
         {
           path: '/profile',
           element: <ProfilePage />
@@ -253,6 +263,7 @@ export default function AppRouter() {
           path: '/resources/dapan11',
           element: <Dapan11 />
         },
+<<<<<<< HEAD
         {
           path: '/resources/dapan12',
           element: <Dapan12 />
@@ -345,6 +356,9 @@ export default function AppRouter() {
           },
         
         
+=======
+
+>>>>>>> e7cd34e4292748dee2f6d5f504460375570e8e5a
         {
           path: '/community/send',
           element: <SendConfession />
@@ -358,6 +372,10 @@ export default function AppRouter() {
   ];
 
   const publicRoutes = [
+    {
+      path: '/vr-tracker',
+      element: <TrackerShell />
+    },
     {
       path: '/404',
       element: <NotFound />

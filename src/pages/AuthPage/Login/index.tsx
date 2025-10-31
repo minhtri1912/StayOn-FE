@@ -55,21 +55,22 @@ export default function LoginPage() {
     }
 
     try {
-      var data = await mutateAsync(formLogin);
-      console.log('Login response data:', data);
-      // `data` may be either the response body or an AxiosResponse containing { data: body }
-      const body: any = data && (data as any).data ? (data as any).data : data;
-      console.log('Login response body:', body);
-      if (body) {
-        helper.cookie_set('AT', body.token);
-        dispatch(login());
-        // navigate to the logged-in home page (StayOnHome)
-        try {
-          router.push('/stayonhome');
-        } catch (e) {
-          // fallback
-          window.location.href = '/stayonhome';
-        }
+      const resp: any = await mutateAsync(formLogin);
+      const body: any = resp?.data ?? resp ?? {};
+      const token: string | undefined =
+        body?.token || body?.accessToken || body?.data?.token;
+
+      if (!token) {
+        setError({ password: 'Đăng nhập thất bại. Vui lòng thử lại.' });
+        return;
+      }
+
+      helper.cookie_set('AT', token);
+      dispatch(login());
+      try {
+        router.push('/stayonhome');
+      } catch (e) {
+        window.location.href = '/stayonhome';
       }
     } catch (err) {
       setError({ password: 'Tên đăng nhập hoặc mật khẩu không đúng.' });
@@ -79,11 +80,11 @@ export default function LoginPage() {
   return (
     <>
       <BasePages
-        className="relative mx-auto min-h-screen w-full flex-1 p-0 bg-white"
+        className="relative mx-auto min-h-screen w-full flex-1 bg-white p-0"
         pageHead="Đăng nhập | Stay On"
       >
-
         {/* Top banner (Xin chao) */}
+<<<<<<< HEAD
         <div className="mx-auto w-max my-2">
           <img src={XinChao} alt="xin chao" className="block w-auto max-w-xl object-contain" />
         </div>
@@ -91,34 +92,63 @@ export default function LoginPage() {
         {/* Center rounded card */}
         <div className="w-full flex justify-center py-10 md:py-4">
           <div className="w-full max-w-2xl rounded-3xl border-2 border-black p-10 md:p-14 bg-white">
+=======
+        <div className="mx-auto my-8 w-max">
+          <img
+            src={XinChao}
+            alt="xin chao"
+            className="block w-auto max-w-xl object-contain"
+          />
+        </div>
+
+        {/* Center rounded card */}
+        <div className="flex w-full justify-center py-10 md:py-16">
+          <div className="w-full max-w-2xl rounded-3xl border-2 border-black bg-white p-10 md:p-14">
+>>>>>>> e7cd34e4292748dee2f6d5f504460375570e8e5a
             <div className="text-center">
-              <h2 className="text-3xl md:text-4xl font-extrabold uppercase">Đăng nhập</h2>
-              <p className="mt-2 text-sm text-muted-foreground">Stay On chào mừng bạn trở lại!</p>
+              <h2 className="text-3xl font-extrabold uppercase md:text-4xl">
+                Đăng nhập
+              </h2>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Stay On chào mừng bạn trở lại!
+              </p>
             </div>
 
             <div className="mt-8">
-              <label className="block text-base font-bold text-black-1000 ">Tên đăng nhập</label>
+              <label className="text-black-1000 block text-base font-bold ">
+                Tên đăng nhập
+              </label>
               <Input
-                placeholder="nguyenvana.stayon1" 
+                placeholder="nguyenvana.stayon1"
                 value={formLogin.username}
-                onChange={(e) => setFormLogin({ ...formLogin, username: e.target.value })}
-                className="w-full bg-white text-black placeholder:text-muted-foreground rounded-md border border-gray-200 mt-2"
+                onChange={(e) =>
+                  setFormLogin({ ...formLogin, username: e.target.value })
+                }
+                className="mt-2 w-full rounded-md border border-gray-200 bg-white text-black placeholder:text-muted-foreground"
               />
-              {error.username && <p className="text-[12px] text-red mt-2">{error.username}</p>}
+              {error.username && (
+                <p className="mt-2 text-[12px] text-red">{error.username}</p>
+              )}
 
-              <label className="block text-base font-bold text-black-1000 mt-6">Mật khẩu</label>
+              <label className="text-black-1000 mt-6 block text-base font-bold">
+                Mật khẩu
+              </label>
               <Input
                 placeholder="Nhập mật khẩu từ 6 ký tự"
                 type="password"
                 value={formLogin.password}
-                onChange={(e) => setFormLogin({ ...formLogin, password: e.target.value })}
-                className="w-full bg-white text-black placeholder:text-muted-foreground rounded-md border border-gray-200 mt-2"
+                onChange={(e) =>
+                  setFormLogin({ ...formLogin, password: e.target.value })
+                }
+                className="mt-2 w-full rounded-md border border-gray-200 bg-white text-black placeholder:text-muted-foreground"
               />
-              {error.password && <p className="text-[12px] text-red mt-2">{error.password}</p>}
+              {error.password && (
+                <p className="mt-2 text-[12px] text-red">{error.password}</p>
+              )}
 
-              <div className="flex justify-center mt-8">
+              <div className="mt-8 flex justify-center">
                 <Button
-                  className="bg-[#9aa2ff] text-black rounded-full px-8 py-3 text-base uppercase tracking-wide shadow-md"
+                  className="rounded-full bg-[#9aa2ff] px-8 py-3 text-base uppercase tracking-wide text-black shadow-md"
                   onClick={handleLogin}
                   disabled={isPending}
                 >
@@ -126,8 +156,11 @@ export default function LoginPage() {
                 </Button>
               </div>
 
-              <p className="text-center text-sm mt-6">
-                Bạn chưa có tài khoản? <a href="/register" className="font-bold underline">Đăng ký ngay</a>
+              <p className="mt-6 text-center text-sm">
+                Bạn chưa có tài khoản?{' '}
+                <a href="/register" className="font-bold underline">
+                  Đăng ký ngay
+                </a>
               </p>
             </div>
           </div>
