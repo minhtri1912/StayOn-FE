@@ -263,7 +263,6 @@ export default function AppRouter() {
           path: '/resources/dapan11',
           element: <Dapan11 />
         },
-<<<<<<< HEAD
         {
           path: '/resources/dapan12',
           element: <Dapan12 />
@@ -356,9 +355,6 @@ export default function AppRouter() {
           },
         
         
-=======
-
->>>>>>> e7cd34e4292748dee2f6d5f504460375570e8e5a
         {
           path: '/community/send',
           element: <SendConfession />
