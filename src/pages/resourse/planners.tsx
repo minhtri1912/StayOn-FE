@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom';
 import plannersImg from '@/assets/planner.png';
 import planner1 from '@/assets/planner1.png';
 import planner2 from '@/assets/planner2.png';
