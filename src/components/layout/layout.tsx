@@ -28,13 +28,21 @@ export default function DashboardLayout({
 
   useEffect(() => {
     const fetch = async () => {
-      let model = { ...PagingModel, orderStatus: 1 };
-      var data = await getOrderByStatus(model);
-      dispatch(updateCart(data));
-      dispatch(updateTotalItems(data.listObjects.length));
+      if (!token) return; // Only fetch if user is logged in
+      try {
+        let model = { ...PagingModel, orderStatus: 1 };
+        var data = await getOrderByStatus(model);
+        if (data && data.listObjects) {
+          dispatch(updateCart(data));
+          dispatch(updateTotalItems(data.listObjects.length || 0));
+        }
+      } catch (error) {
+        // Silently handle errors - this might fail if endpoint doesn't exist
+        console.warn('Failed to fetch cart data:', error);
+      }
     };
     fetch();
-  }, []);
+  }, [token]);
 
   // Scroll to top when any button is clicked in the app.
   useEffect(() => {
@@ -61,6 +69,16 @@ export default function DashboardLayout({
     return (
       <div className="flex h-screen flex-col overflow-hidden bg-background">
         <main className="flex-1 overflow-hidden">{children}</main>
+        <Toaster />
+      </div>
+    );
+  }
+
+  // Hide navigation for admin pages
+  if (location.pathname.startsWith('/admin')) {
+    return (
+      <div className="flex h-screen flex-col overflow-hidden bg-background">
+        <main className="flex-1 overflow-y-auto">{children}</main>
         <Toaster />
       </div>
     );

@@ -1,125 +1,525 @@
 import Footer from '@/components/shared/footer';
+import {
+  useAdminDashboardStats,
+  useAdminMonthlyRevenue
+} from '@/queries/admin.query';
+import { useNavigate } from 'react-router-dom';
+import {
+  BarChart,
+  Bar,
+  LineChart,
+  Line,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer
+} from 'recharts';
+import {
+  Users,
+  DollarSign,
+  FileText,
+  MessageSquare,
+  Package,
+  FolderOpen,
+  Sparkles,
+  Activity
+} from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { RootState } from '@/redux/store';
+import { getRoleFromToken } from '@/helpers/jwt';
+import helper from '@/helpers/index';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select';
+import UserNav from '@/components/shared/user-nav';
+
+const COLORS = [
+  '#0088FE',
+  '#00C49F',
+  '#FFBB28',
+  '#FF8042',
+  '#8884d8',
+  '#82ca9d'
+];
 
 export default function AdminHome() {
-  // The `admin` slice may be missing in some branches (the slice or store registration
-  // was undone). Use a permissive selector here to avoid a TypeScript error when
-  // `RootState` doesn't include `admin`. Restore the strongly-typed selector after
-  // the `admin` reducer is added back to the store.
-  const admin = useSelector((s: any) => s?.admin);
+  const { data: stats, isLoading } = useAdminDashboardStats();
+  const navigate = useNavigate();
+  const authState = useSelector((state: RootState) => state.auth);
+  const currentYear = new Date().getFullYear();
+  const [selectedYear, setSelectedYear] = useState(currentYear);
 
+  const { data: monthlyRevenueData, isLoading: isLoadingMonthly } =
+    useAdminMonthlyRevenue(selectedYear);
 
+  useEffect(() => {
+    // Verify role on mount
+    const token = helper.cookie_get('AT');
+    if (token) {
+      const role = getRoleFromToken(token);
+      if (role !== 'Admin') {
+        navigate('/stayonhome');
+      }
+    } else {
+      navigate('/login');
+    }
+  }, [navigate]);
 
-  const metrics = admin?.metrics ?? [];
+  // Prepare metrics cards
+  const metrics = [
+    {
+      label: 'Total Users',
+      value: stats?.users?.total || 0,
+      delta: `+${stats?.users?.newToday || 0} today`,
+      icon: Users,
+      color: 'text-blue-600'
+    },
+    {
+      label: 'Revenue (All Time)',
+      value: new Intl.NumberFormat('vi-VN', {
+        style: 'currency',
+        currency: 'VND'
+      }).format(stats?.revenue?.allTime || 0),
+      delta: `${stats?.revenue?.transactions?.successful || 0} successful`,
+      icon: DollarSign,
+      color: 'text-green-600'
+    },
+    {
+      label: 'Total Templates',
+      value: stats?.content?.templates?.total || 0,
+      delta: `${stats?.content?.templates?.downloads || 0} downloads`,
+      icon: FileText,
+      color: 'text-purple-600'
+    },
+    {
+      label: 'Total Sessions',
+      value: stats?.activity?.sessions?.total || 0,
+      delta: `Avg: ${stats?.activity?.sessions?.avgDurationMinutes || 0} min`,
+      icon: Activity,
+      color: 'text-orange-600'
+    }
+  ];
 
+  // Prepare user growth chart data (simplified - using available data)
+  const userGrowthData = [
+    { name: 'Free Users', value: stats?.users?.subscriptions?.free || 0 },
+    { name: 'Premium Users', value: stats?.users?.subscriptions?.premium || 0 }
+  ];
+
+  // Prepare template revenue chart data
+  const templateData = [
+    { name: 'Total', value: stats?.content?.templates?.total || 0 },
+    { name: 'Paid', value: stats?.content?.templates?.paid || 0 },
+    {
+      name: 'Free',
+      value:
+        (stats?.content?.templates?.total || 0) -
+        (stats?.content?.templates?.paid || 0)
+    }
+  ];
+
+  // Prepare revenue breakdown
+  const revenueData = [
+    { period: 'Today', value: stats?.revenue?.today || 0 },
+    { period: 'Week', value: stats?.revenue?.week || 0 },
+    { period: 'Month', value: stats?.revenue?.month || 0 },
+    { period: 'All Time', value: stats?.revenue?.allTime || 0 }
+  ];
+
+  // Prepare monthly revenue data for selected year
+  const monthlyRevenueChartData = monthlyRevenueData?.monthlyRevenue
+    ? (monthlyRevenueData.monthlyRevenue as any[]).map((item: any) => ({
+        month: item.monthName || `Tháng ${item.month}`,
+        revenue: item.revenue || 0
+      }))
+    : Array.from({ length: 12 }, (_, i) => ({
+        month: new Date(selectedYear, i, 1).toLocaleDateString('vi-VN', {
+          month: 'short'
+        }),
+        revenue: 0
+      }));
+
+  // Generate year options (from 2020 to current year + 1)
+  const yearOptions = Array.from(
+    { length: currentYear - 2019 },
+    (_, i) => currentYear - i
+  );
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="mx-auto h-12 w-12 animate-spin rounded-full border-b-2 border-gray-900"></div>
+          <p className="mt-4 text-gray-600">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <main className="max-w-7xl mx-auto py-10 px-6">
+    <div className="min-h-screen bg-gray-50 transition-all duration-300">
+      <main className="mx-auto max-w-7xl px-6 py-10">
         {/* Top header */}
-        <div className="flex items-center justify-between mb-8">
-
-          <h1 className="text-4xl font-extrabold tracking-tight text-center flex-1">DASHBOARD</h1>
-
-          <div className="w-40" />
+        <div className="mb-8 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => navigate('/stayonhome')}
+              className="text-gray-600 transition-colors hover:text-gray-900"
+            >
+              ← Back
+            </button>
+          </div>
+          <h1 className="flex-1 text-center text-4xl font-extrabold tracking-tight">
+            DASHBOARD
+          </h1>
+          <div className="flex w-40 justify-end">
+            <UserNav />
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
           {/* Left / Main area */}
-          <div className="lg:col-span-9 space-y-6">
+          <div className="space-y-6 transition-all duration-300 lg:col-span-9">
             {/* Metric summary */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {metrics.map((m) => (
-                <div key={m.label} className="bg-white p-4 rounded-lg shadow-sm border border-black/5">
-                  <div className="text-sm text-gray-500">{m.label}</div>
-                  <div className="text-2xl font-semibold mt-2">{m.value}</div>
-                  <div className="text-xs text-green-600 mt-1">{m.delta}</div>
-                </div>
-              ))}
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+              {metrics.map((metric, index) => {
+                const Icon = metric.icon;
+                return (
+                  <div
+                    key={metric.label}
+                    className="transform rounded-lg border border-black/5 bg-white p-4 shadow-sm transition-shadow duration-300 hover:-translate-y-1 hover:shadow-md"
+                    style={{ animationDelay: `${index * 100}ms` }}
+                  >
+                    <div className="mb-2 flex items-center justify-between">
+                      <div className={`text-sm text-gray-500 ${metric.color}`}>
+                        {metric.label}
+                      </div>
+                      <Icon className={`h-5 w-5 ${metric.color}`} />
+                    </div>
+                    <div className="mt-2 text-2xl font-semibold transition-all duration-300">
+                      {typeof metric.value === 'string'
+                        ? metric.value
+                        : metric.value.toLocaleString()}
+                    </div>
+                    <div className="mt-1 text-xs text-green-600">
+                      {metric.delta}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
 
-            {/* Large chart placeholder */}
-            <div className="bg-white rounded-lg shadow-sm border border-black/5 p-6">
-              <div className="flex items-start justify-between mb-4">
-                <h2 className="text-lg font-semibold">Total Users</h2>
-                <div className="text-sm text-gray-500">This year vs Last year</div>
+            {/* Large chart - Users Overview */}
+            <div className="rounded-lg border border-black/5 bg-white p-6 shadow-sm transition-all duration-300 hover:shadow-md">
+              <div className="mb-4 flex items-start justify-between">
+                <h2 className="text-lg font-semibold">Users Overview</h2>
+                <div className="text-sm text-gray-500">
+                  Active: {stats?.users?.active30Days || 0} (30 days)
+                </div>
               </div>
 
               <div className="flex gap-6">
-                {/* Line chart area */}
                 <div className="flex-1">
-                  <ChartLines {...(admin?.chart ?? undefined)} />
+                  <ResponsiveContainer width="100%" height={250}>
+                    <BarChart data={userGrowthData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="name" />
+                      <YAxis />
+                      <Tooltip />
+                      <Legend />
+                      <Bar dataKey="value" fill="#8884d8" />
+                    </BarChart>
+                  </ResponsiveContainer>
                 </div>
 
-                {/* Right mini legend/list */}
-                <div className="w-48 bg-white">
-                  <div className="text-sm font-medium mb-3">Traffic by Website</div>
-                  <ul className="space-y-3 text-sm text-gray-700">
-                    {[
-                      ['Google', 80],
-                      ['YouTube', 60],
-                      ['Instagram', 50],
-                      ['Pinterest', 40],
-                      ['Facebook', 30],
-                      ['Twitter', 20]
-                    ].map(([name, pct]) => (
-                      <li key={String(name)} className="flex items-center justify-between">
-                        <span>{name}</span>
-                        <div className="w-24 h-2 bg-gray-200 rounded overflow-hidden ml-2">
-                          <div style={{ width: `${pct}%` }} className="h-full bg-black/70" />
-                        </div>
+                <div className="w-48 space-y-4">
+                  <div>
+                    <div className="mb-3 text-sm font-medium">User Types</div>
+                    <ul className="space-y-2 text-sm text-gray-700">
+                      <li className="flex items-center justify-between">
+                        <span>Free</span>
+                        <span className="font-semibold">
+                          {stats?.users?.subscriptions?.free || 0}
+                        </span>
                       </li>
-                    ))}
-                  </ul>
+                      <li className="flex items-center justify-between">
+                        <span>Premium</span>
+                        <span className="font-semibold">
+                          {stats?.users?.subscriptions?.premium || 0}
+                        </span>
+                      </li>
+                      <li className="flex items-center justify-between border-t pt-2">
+                        <span>Total</span>
+                        <span className="font-semibold">
+                          {stats?.users?.total || 0}
+                        </span>
+                      </li>
+                    </ul>
+                  </div>
                 </div>
               </div>
             </div>
 
+            {/* Monthly Revenue Chart - New Large Chart */}
+            <div className="rounded-lg border border-black/5 bg-white p-6 shadow-sm transition-all duration-300 hover:shadow-md">
+              <div className="mb-4 flex items-center justify-between">
+                <h2 className="text-lg font-semibold">Monthly Revenue</h2>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-gray-500">Year:</span>
+                  <Select
+                    value={selectedYear.toString()}
+                    onValueChange={(value) => setSelectedYear(parseInt(value))}
+                  >
+                    <SelectTrigger className="h-9 w-32">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {yearOptions.map((year) => (
+                        <SelectItem key={year} value={year.toString()}>
+                          {year}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              {isLoadingMonthly ? (
+                <div className="flex h-64 items-center justify-center">
+                  <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-gray-900"></div>
+                </div>
+              ) : (
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={monthlyRevenueChartData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis
+                      dataKey="month"
+                      angle={-45}
+                      textAnchor="end"
+                      height={80}
+                    />
+                    <YAxis />
+                    <Tooltip
+                      formatter={(value: number) =>
+                        new Intl.NumberFormat('vi-VN', {
+                          style: 'currency',
+                          currency: 'VND'
+                        }).format(value)
+                      }
+                      labelStyle={{ color: '#333' }}
+                    />
+                    <Legend />
+                    <Bar
+                      dataKey="revenue"
+                      fill="#00C49F"
+                      radius={[8, 8, 0, 0]}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              )}
+            </div>
+
             {/* Smaller cards row */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="bg-white rounded-lg shadow-sm border border-black/5 p-4">
-                <div className="text-sm text-gray-500">Traffic by Device</div>
-                <div className="h-28 mt-3 bg-gray-50 rounded-md flex items-center justify-center text-gray-400">Bar chart</div>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+              {/* Revenue Chart */}
+              <div className="rounded-lg border border-black/5 bg-white p-4 shadow-sm transition-all duration-300 hover:shadow-md">
+                <div className="mb-3 text-sm text-gray-500">
+                  Revenue Breakdown
+                </div>
+                <ResponsiveContainer width="100%" height={150}>
+                  <BarChart data={revenueData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="period" />
+                    <YAxis />
+                    <Tooltip
+                      formatter={(value: number) =>
+                        new Intl.NumberFormat('vi-VN', {
+                          style: 'currency',
+                          currency: 'VND'
+                        }).format(value)
+                      }
+                    />
+                    <Bar dataKey="value" fill="#00C49F" />
+                  </BarChart>
+                </ResponsiveContainer>
               </div>
 
-              <div className="bg-white rounded-lg shadow-sm border border-black/5 p-4">
-                <div className="text-sm text-gray-500">Traffic by Location</div>
-                <div className="h-28 mt-3 bg-gray-50 rounded-md flex items-center justify-center text-gray-400">Pie chart</div>
+              {/* Templates Chart */}
+              <div className="rounded-lg border border-black/5 bg-white p-4 shadow-sm transition-all duration-300 hover:shadow-md">
+                <div className="mb-3 text-sm text-gray-500">
+                  Templates Distribution
+                </div>
+                <ResponsiveContainer width="100%" height={150}>
+                  <PieChart>
+                    <Pie
+                      data={templateData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({ name, percent }) =>
+                        `${name}: ${(percent * 100).toFixed(0)}%`
+                      }
+                      outerRadius={50}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {templateData.map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={COLORS[index % COLORS.length]}
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
               </div>
 
-              <div className="bg-white rounded-lg shadow-sm border border-black/5 p-4">
-                <div className="text-sm text-gray-500">Marketing & SEO</div>
-                <div className="h-28 mt-3 bg-gray-50 rounded-md flex items-center justify-center text-gray-400">Trends</div>
+              {/* Content Stats */}
+              <div className="rounded-lg border border-black/5 bg-white p-4 shadow-sm transition-all duration-300 hover:shadow-md">
+                <div className="mb-3 text-sm text-gray-500">
+                  Content Statistics
+                </div>
+                <div className="mt-3 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm">Tips (Daily)</span>
+                    <span className="font-semibold">
+                      {stats?.content?.tips?.daily || 0}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm">Tips (Library)</span>
+                    <span className="font-semibold">
+                      {stats?.content?.tips?.library || 0}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between border-t pt-2">
+                    <span className="text-sm font-medium">Confessions</span>
+                    <span className="font-semibold">
+                      {stats?.content?.confessions?.total || 0}
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
           {/* Right sidebar */}
-          <aside className="lg:col-span-3">
-            <div className="bg-white rounded-lg shadow-sm border border-black/5 p-4 mb-4">
-              <h3 className="text-sm font-semibold mb-3">Notifications</h3>
+          <aside className="space-y-4 lg:col-span-3">
+            {/* Alerts */}
+            {stats?.alerts && stats.alerts.length > 0 && (
+              <div className="rounded-lg border border-black/5 bg-white p-4 shadow-sm transition-all duration-300">
+                <h3 className="text-red-600 mb-3 text-sm font-semibold">
+                  Alerts
+                </h3>
+                <ul className="space-y-2 text-sm text-gray-700">
+                  {(stats.alerts as any[]).map((alert: any, index: number) => (
+                    <li key={index} className="flex items-start gap-2">
+                      <span className="bg-red-400 mt-2 h-2 w-2 flex-shrink-0 rounded-full" />
+                      <span>
+                        {alert.message ||
+                          `${alert.count} ${alert.type} pending`}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Quick Stats */}
+            <div className="rounded-lg border border-black/5 bg-white p-4 shadow-sm transition-all duration-300">
+              <h3 className="mb-3 text-sm font-semibold">Quick Stats</h3>
               <ul className="space-y-2 text-sm text-gray-700">
-                <li className="flex items-start gap-3"><span className="w-2 h-2 rounded-full bg-red-400 mt-2" /> You fixed a bug.</li>
-                <li className="flex items-start gap-3"><span className="w-2 h-2 rounded-full bg-green-400 mt-2" /> New user registered.</li>
-                <li className="flex items-start gap-3"><span className="w-2 h-2 rounded-full bg-yellow-400 mt-2" /> New resource added.</li>
+                <li className="flex items-center justify-between">
+                  <span>Pending Confessions</span>
+                  <span className="text-orange-600 font-semibold">
+                    {stats?.content?.confessions?.pendingApproval || 0}
+                  </span>
+                </li>
+                <li className="flex items-center justify-between">
+                  <span>Pending Transactions</span>
+                  <span className="text-yellow-600 font-semibold">
+                    {stats?.revenue?.transactions?.pending || 0}
+                  </span>
+                </li>
+                <li className="flex items-center justify-between">
+                  <span>Refunded</span>
+                  <span className="text-red-600 font-semibold">
+                    {stats?.revenue?.transactions?.refunded || 0}
+                  </span>
+                </li>
+                <li className="flex items-center justify-between border-t pt-2">
+                  <span>Sessions with AI</span>
+                  <span className="font-semibold">
+                    {stats?.activity?.sessions?.withAI || 0}
+                  </span>
+                </li>
               </ul>
             </div>
 
-            <div className="bg-white rounded-lg shadow-sm border border-black/5 p-4 mb-4">
-              <h3 className="text-sm font-semibold mb-3">Recent activity</h3>
-              <ul className="space-y-3 text-sm text-gray-700">
-                <li>Changed the style.</li>
-                <li>Submitted a new version.</li>
-                <li>Deleted a page in Project X.</li>
-              </ul>
-            </div>
-
-            <div className="bg-white rounded-lg shadow-sm border border-black/5 p-4">
-              <h3 className="text-sm font-semibold mb-3">Contacts</h3>
-              <ul className="space-y-2 text-sm text-gray-700">
-                <li>Natalie Craig</li>
-                <li>Drew Cano</li>
-                <li>Andi Lane</li>
+            {/* Navigation */}
+            <div className="rounded-lg border border-black/5 bg-white p-4 shadow-sm transition-all duration-300">
+              <h3 className="mb-3 text-sm font-semibold">Management</h3>
+              <ul className="space-y-2">
+                <li>
+                  <button
+                    onClick={() => navigate('/admin/confessions')}
+                    className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm transition-colors hover:bg-gray-100"
+                  >
+                    <MessageSquare className="h-4 w-4" />
+                    Confessions
+                    {stats?.content?.confessions?.pendingApproval > 0 && (
+                      <span className="bg-red-500 ml-auto rounded-full px-2 py-1 text-xs text-white">
+                        {stats.content.confessions.pendingApproval}
+                      </span>
+                    )}
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={() => navigate('/admin/premium-packages')}
+                    className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm transition-colors hover:bg-gray-100"
+                  >
+                    <Package className="h-4 w-4" />
+                    Premium Packages
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={() => navigate('/admin/template-categories')}
+                    className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm transition-colors hover:bg-gray-100"
+                  >
+                    <FolderOpen className="h-4 w-4" />
+                    Template Categories
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={() => navigate('/admin/templates')}
+                    className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm transition-colors hover:bg-gray-100"
+                  >
+                    <FileText className="h-4 w-4" />
+                    Templates
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={() => navigate('/admin/tips')}
+                    className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm transition-colors hover:bg-gray-100"
+                  >
+                    <Sparkles className="h-4 w-4" />
+                    Tips
+                  </button>
+                </li>
               </ul>
             </div>
           </aside>
@@ -127,58 +527,6 @@ export default function AdminHome() {
       </main>
 
       <Footer />
-    </div>
-  );
-}
-
-function ChartLines(props?: { months?: string[]; thisYear?: number[]; lastYear?: number[] }) {
-  const months = props?.months ?? ['Jan','Feb','Mar','Apr','May','Jun','Jul'];
-  const thisYear = props?.thisYear ?? [11000,9000,12000,25000,23000,18000,24000];
-  const lastYear = props?.lastYear ?? [5000,15000,8000,7000,10000,22000,30000];
-
-  const w = 520;
-  const h = 180;
-  const pad = 20;
-  const innerW = w - pad * 2;
-  const innerH = h - pad * 2;
-
-  const max = Math.max(...thisYear, ...lastYear) * 1.1;
-  const toX = (i: number) => pad + (innerW * i) / (months.length - 1);
-  const toY = (v: number) => pad + innerH - (innerH * v) / max;
-
-  const points = (arr: number[]) => arr.map((v, i) => `${toX(i)},${toY(v)}`).join(' ');
-  const polyThis = points(thisYear);
-  const polyLast = points(lastYear);
-
-  const areaPath = `M ${toX(0)} ${toY(0)} L ${thisYear.map((v,i)=>`${toX(i)} ${toY(v)}`).join(' L ')} L ${toX(months.length-1)} ${toY(0)} Z`;
-
-  return (
-    <div>
-      <svg viewBox={`0 0 ${w} ${h}`} width="100%" height="220">
-        <defs>
-          <linearGradient id="areaGrad" x1="0" x2="0" y1="0" y2="1">
-            <stop offset="0%" stopColor="#F8FAFC" stopOpacity="1" />
-            <stop offset="100%" stopColor="#F8FAFC" stopOpacity="0" />
-          </linearGradient>
-        </defs>
-
-        {/* background grid */}
-        <rect x={0} y={0} width={w} height={h} rx={12} fill="#fff" />
-
-        {/* area under this year */}
-        <path d={areaPath} fill="url(#areaGrad)" />
-
-        {/* last year dotted */}
-        <polyline points={polyLast} fill="none" stroke="#93C5FD" strokeWidth={2} strokeDasharray="6 6" strokeLinecap="round" strokeLinejoin="round" />
-
-        {/* this year solid */}
-        <polyline points={polyThis} fill="none" stroke="#111827" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
-
-        {/* month labels */}
-        {months.map((m, i) => (
-          <text key={m} x={toX(i)} y={h - 4} textAnchor="middle" fontSize={10} fill="#9CA3AF">{m}</text>
-        ))}
-      </svg>
     </div>
   );
 }

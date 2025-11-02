@@ -2,6 +2,7 @@ import ScrollToTop from '@/hooks/scroll-to-top';
 import NotFound from '@/pages/not-found';
 import { Suspense, lazy } from 'react';
 import { Navigate, Outlet, useRoutes } from 'react-router-dom';
+import ProtectedRoute from '@/components/shared/ProtectedRoute';
 
 const SystemLayout = lazy(() => import('@/components/layout/layout'));
 const HomePage = lazy(() => import('@/pages/Home/index'));
@@ -74,6 +75,16 @@ const Planners = lazy(() => import('@/pages/resourse/planners'));
 const Matrix = lazy(() => import('@/pages/resourse/matrix'));
 const Cornell = lazy(() => import('@/pages/resourse/cornell'));
 const AdminHome = lazy(() => import('@/pages/Admin/admin'));
+const AdminConfessions = lazy(() => import('@/pages/Admin/Confessions'));
+const AdminPremiumPackages = lazy(
+  () => import('@/pages/Admin/PremiumPackages')
+);
+const AdminTemplateCategories = lazy(
+  () => import('@/pages/Admin/TemplateCategories')
+);
+const AdminTemplates = lazy(() => import('@/pages/Admin/Templates'));
+const AdminTips = lazy(() => import('@/pages/Admin/Tips'));
+const TipsPage = lazy(() => import('@/pages/Tips/index'));
 
 // ----------------------------------------------------------------------
 
@@ -162,6 +173,10 @@ export default function AppRouter() {
         {
           path: '/resources',
           element: <MainResourse />
+        },
+        {
+          path: '/tips',
+          element: <TipsPage />
         },
         {
           path: '/stayonhome',
@@ -348,13 +363,56 @@ export default function AppRouter() {
           path: '/resources/todo',
           element: <Navigate to="/resources/todolist" replace />
         },
-          // Admin routes
-          {
-            path: '/admin',
-            element: <AdminHome />
-          },
-        
-        
+        // Admin routes
+        {
+          path: '/admin',
+          element: (
+            <ProtectedRoute requiredRole="Admin">
+              <AdminHome />
+            </ProtectedRoute>
+          )
+        },
+        {
+          path: '/admin/confessions',
+          element: (
+            <ProtectedRoute requiredRole="Admin">
+              <AdminConfessions />
+            </ProtectedRoute>
+          )
+        },
+        {
+          path: '/admin/premium-packages',
+          element: (
+            <ProtectedRoute requiredRole="Admin">
+              <AdminPremiumPackages />
+            </ProtectedRoute>
+          )
+        },
+        {
+          path: '/admin/template-categories',
+          element: (
+            <ProtectedRoute requiredRole="Admin">
+              <AdminTemplateCategories />
+            </ProtectedRoute>
+          )
+        },
+        {
+          path: '/admin/templates',
+          element: (
+            <ProtectedRoute requiredRole="Admin">
+              <AdminTemplates />
+            </ProtectedRoute>
+          )
+        },
+        {
+          path: '/admin/tips',
+          element: (
+            <ProtectedRoute requiredRole="Admin">
+              <AdminTips />
+            </ProtectedRoute>
+          )
+        },
+
         {
           path: '/community/send',
           element: <SendConfession />

@@ -4,7 +4,10 @@ import helpers from '../helpers';
 const baseURL = 'https://api.stayon.io.vn/';
 const token = helpers.cookie_get('AT');
 const onRequestSuccess = (config: any) => {
-  config.headers['Authorization'] = `Bearer ${helpers.cookie_get('AT')}`;
+  const token = helpers.cookie_get('AT');
+  if (token) {
+    config.headers['Authorization'] = `Bearer ${token}`;
+  }
   return config;
 };
 const onRequestError = (error: any) => {

@@ -9,6 +9,7 @@ import helper from '@/helpers/index';
 import { useDispatch } from 'react-redux';
 import { login } from '@/redux/auth.slice';
 import Footer from '@/components/shared/footer';
+import { getRoleFromToken, getUserIdFromToken } from '@/helpers/jwt';
 
 type FormLogin = {
   username: string;
@@ -30,8 +31,16 @@ export default function LoginPage() {
   useEffect(() => {
     var token = helper.cookie_get('AT');
     if (token) {
-      dispatch(login());
-      window.location.href = '/stayonhome';
+      const role = getRoleFromToken(token);
+      const userId = getUserIdFromToken(token);
+      dispatch(login({ role, userId }));
+
+      // Redirect based on role
+      if (role === 'Admin') {
+        window.location.href = '/admin';
+      } else {
+        window.location.href = '/stayonhome';
+      }
     }
   }, []);
 
@@ -66,11 +75,26 @@ export default function LoginPage() {
       }
 
       helper.cookie_set('AT', token);
-      dispatch(login());
+
+      // Decode JWT to get role and userId
+      const role = getRoleFromToken(token);
+      const userId = getUserIdFromToken(token);
+
+      dispatch(login({ role, userId }));
+
+      // Redirect based on role
       try {
-        router.push('/stayonhome');
+        if (role === 'Admin') {
+          router.push('/admin');
+        } else {
+          router.push('/stayonhome');
+        }
       } catch (e) {
-        window.location.href = '/stayonhome';
+        if (role === 'Admin') {
+          window.location.href = '/admin';
+        } else {
+          window.location.href = '/stayonhome';
+        }
       }
     } catch (err) {
       setError({ password: 'Tên đăng nhập hoặc mật khẩu không đúng.' });
@@ -84,13 +108,17 @@ export default function LoginPage() {
         pageHead="Đăng nhập | Stay On"
       >
         {/* Top banner (Xin chao) */}
-        <div className="mx-auto w-max my-2">
-          <img src={XinChao} alt="xin chao" className="block w-auto max-w-xl object-contain" />
+        <div className="mx-auto my-2 w-max">
+          <img
+            src={XinChao}
+            alt="xin chao"
+            className="block w-auto max-w-xl object-contain"
+          />
         </div>
 
         {/* Center rounded card */}
-        <div className="w-full flex justify-center py-10 md:py-4">
-          <div className="w-full max-w-2xl rounded-3xl border-2 border-black p-10 md:p-14 bg-white">
+        <div className="flex w-full justify-center py-10 md:py-4">
+          <div className="w-full max-w-2xl rounded-3xl border-2 border-black bg-white p-10 md:p-14">
             <div className="text-center">
               <h2 className="text-3xl font-extrabold uppercase md:text-4xl">
                 Đăng nhập
