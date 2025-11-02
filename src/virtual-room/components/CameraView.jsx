@@ -354,23 +354,37 @@ function CameraView({ onFaceData, isTracking }) {
       // Initialize FaceMesh with dynamic import
       let faceMesh;
       try {
-        // Try destructuring first (simplest approach)
-        const FaceMeshModule = await import('@mediapipe/face_mesh');
+        // Import module - try both package import and direct file import
+        let FaceMeshModule;
         let FaceMeshClass = null;
 
-        // First try: named export (destructuring)
         try {
-          const { FaceMesh } = FaceMeshModule;
-          if (FaceMesh && typeof FaceMesh === 'function') {
-            FaceMeshClass = FaceMesh;
-            console.log('✅ FaceMesh found via named export');
-          }
+          // Try package import first
+          FaceMeshModule = await import('@mediapipe/face_mesh');
         } catch (e) {
-          // Named export not available, try default
+          // If package import fails, try direct file import
+          FaceMeshModule = await import('@mediapipe/face_mesh/face_mesh.js');
         }
 
-        // Second try: default export patterns
-        if (!FaceMeshClass && FaceMeshModule.default) {
+        // First try: named export (destructuring)
+        if (
+          FaceMeshModule.FaceMesh &&
+          typeof FaceMeshModule.FaceMesh === 'function'
+        ) {
+          FaceMeshClass = FaceMeshModule.FaceMesh;
+          console.log('✅ FaceMesh found via named export');
+        }
+        // Second try: check if FaceMesh was added to global scope
+        else if (
+          typeof window !== 'undefined' &&
+          window.FaceMesh &&
+          typeof window.FaceMesh === 'function'
+        ) {
+          FaceMeshClass = window.FaceMesh;
+          console.log('✅ FaceMesh found in window object');
+        }
+        // Third try: default export patterns
+        else if (FaceMeshModule.default) {
           if (typeof FaceMeshModule.default === 'function') {
             FaceMeshClass = FaceMeshModule.default;
             console.log('✅ FaceMesh found as default function');
