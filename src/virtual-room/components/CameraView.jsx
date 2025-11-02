@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import { Camera } from '@mediapipe/camera_utils';
-import { FaceMesh } from '@mediapipe/face_mesh';
 import * as faceapi from '@vladmandic/face-api';
 import './CameraView.css';
 
@@ -352,10 +351,26 @@ function CameraView({ onFaceData, isTracking }) {
         return;
       }
 
-      const faceMesh = new FaceMesh({
-        locateFile: (f) =>
-          `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${f}`
-      });
+      // Initialize FaceMesh with dynamic import to fix constructor issue
+      let faceMesh;
+      try {
+        const { FaceMesh: FaceMeshClass } = await import(
+          '@mediapipe/face_mesh'
+        );
+        if (!FaceMeshClass || typeof FaceMeshClass !== 'function') {
+          throw new Error(
+            'FaceMesh is not a constructor. Check @mediapipe/face_mesh package.'
+          );
+        }
+        faceMesh = new FaceMeshClass({
+          locateFile: (f) =>
+            `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${f}`
+        });
+      } catch (error) {
+        console.error('Failed to initialize FaceMesh:', error);
+        setError(`FaceMesh initialization failed: ${error.message}`);
+        throw error;
+      }
 
       faceMesh.setOptions({
         maxNumFaces: 1,
