@@ -351,17 +351,43 @@ function CameraView({ onFaceData, isTracking }) {
         return;
       }
 
-      // Initialize FaceMesh with dynamic import to fix constructor issue
+      // Initialize FaceMesh - try multiple import patterns
       let faceMesh;
       try {
-        const { FaceMesh: FaceMeshClass } = await import(
-          '@mediapipe/face_mesh'
-        );
-        if (!FaceMeshClass || typeof FaceMeshClass !== 'function') {
+        // Try namespace import first (recommended for @mediapipe/face_mesh)
+        const FaceMeshModule = await import('@mediapipe/face_mesh');
+
+        // Try different possible export patterns
+        let FaceMeshClass = null;
+        if (
+          FaceMeshModule.FaceMesh &&
+          typeof FaceMeshModule.FaceMesh === 'function'
+        ) {
+          FaceMeshClass = FaceMeshModule.FaceMesh;
+        } else if (
+          FaceMeshModule.default &&
+          typeof FaceMeshModule.default === 'function'
+        ) {
+          FaceMeshClass = FaceMeshModule.default;
+        } else if (
+          FaceMeshModule.default?.FaceMesh &&
+          typeof FaceMeshModule.default.FaceMesh === 'function'
+        ) {
+          FaceMeshClass = FaceMeshModule.default.FaceMesh;
+        } else {
+          // Log module structure for debugging
+          console.error('FaceMesh module structure:', {
+            keys: Object.keys(FaceMeshModule),
+            hasDefault: !!FaceMeshModule.default,
+            hasFaceMesh: !!FaceMeshModule.FaceMesh,
+            module: FaceMeshModule
+          });
           throw new Error(
-            'FaceMesh is not a constructor. Check @mediapipe/face_mesh package.'
+            'FaceMesh constructor not found. Available keys: ' +
+              Object.keys(FaceMeshModule || {}).join(', ')
           );
         }
+
         faceMesh = new FaceMeshClass({
           locateFile: (f) =>
             `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${f}`
