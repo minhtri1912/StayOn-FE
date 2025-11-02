@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import { Camera } from '@mediapipe/camera_utils';
 import * as faceapi from '@vladmandic/face-api';
 import './CameraView.css';
 
@@ -338,6 +337,46 @@ function CameraView({ onFaceData, isTracking }) {
   };
 
   // -------------------------------------
+  //      LOAD MEDIAPIPE SCRIPTS FROM CDN
+  // -------------------------------------
+  const loadMediaPipeScripts = () => {
+    return new Promise((resolve, reject) => {
+      // Check if already loaded
+      if (typeof window !== 'undefined' && window.Camera && window.FaceMesh) {
+        console.log('✅ MediaPipe scripts already loaded');
+        resolve();
+        return;
+      }
+
+      // Load Camera utils first
+      const cameraScript = document.createElement('script');
+      cameraScript.src =
+        'https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js';
+      cameraScript.crossOrigin = 'anonymous';
+      cameraScript.onload = () => {
+        console.log('✅ Camera utils loaded');
+        // Then load FaceMesh
+        const faceMeshScript = document.createElement('script');
+        faceMeshScript.src =
+          'https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js';
+        faceMeshScript.crossOrigin = 'anonymous';
+        faceMeshScript.onload = () => {
+          console.log('✅ FaceMesh loaded');
+          resolve();
+        };
+        faceMeshScript.onerror = () => {
+          reject(new Error('Failed to load FaceMesh from CDN'));
+        };
+        document.head.appendChild(faceMeshScript);
+      };
+      cameraScript.onerror = () => {
+        reject(new Error('Failed to load Camera utils from CDN'));
+      };
+      document.head.appendChild(cameraScript);
+    });
+  };
+
+  // -------------------------------------
   //      CAMERA + FACE MESH INIT
   // -------------------------------------
   const initializeCamera = async () => {
@@ -351,151 +390,22 @@ function CameraView({ onFaceData, isTracking }) {
         return;
       }
 
-      // Initialize FaceMesh with dynamic import
+      // Load MediaPipe scripts from CDN
+      await loadMediaPipeScripts();
+
+      // Initialize FaceMesh using CDN-loaded constructor
       let faceMesh;
       try {
-        // Import module - try both package import and direct file import
-        let FaceMeshModule;
-        let FaceMeshClass = null;
-
-        try {
-          // Try package import first
-          FaceMeshModule = await import('@mediapipe/face_mesh');
-        } catch (e) {
-          // If package import fails, try direct file import
-          FaceMeshModule = await import('@mediapipe/face_mesh/face_mesh.js');
-        }
-
-        // First try: named export (destructuring)
-        if (
-          FaceMeshModule.FaceMesh &&
-          typeof FaceMeshModule.FaceMesh === 'function'
-        ) {
-          FaceMeshClass = FaceMeshModule.FaceMesh;
-          console.log('✅ FaceMesh found via named export');
-        }
-        // Second try: check if FaceMesh was added to global scope
-        else if (
-          typeof window !== 'undefined' &&
-          window.FaceMesh &&
-          typeof window.FaceMesh === 'function'
-        ) {
-          FaceMeshClass = window.FaceMesh;
-          console.log('✅ FaceMesh found in window object');
-        }
-        // Third try: default export patterns
-        else if (FaceMeshModule.default) {
-          if (typeof FaceMeshModule.default === 'function') {
-            FaceMeshClass = FaceMeshModule.default;
-            console.log('✅ FaceMesh found as default function');
-          } else if (
-            FaceMeshModule.default.FaceMesh &&
-            typeof FaceMeshModule.default.FaceMesh === 'function'
-          ) {
-            FaceMeshClass = FaceMeshModule.default.FaceMesh;
-            console.log('✅ FaceMesh found in default.FaceMesh');
-          } else if (
-            FaceMeshModule.default.default &&
-            typeof FaceMeshModule.default.default === 'function'
-          ) {
-            FaceMeshClass = FaceMeshModule.default.default;
-            console.log('✅ FaceMesh found in default.default');
-          }
-        }
-
-        // Check global scope (MediaPipe may expose FaceMesh globally)
-        if (!FaceMeshClass && typeof window !== 'undefined') {
-          // Check various global patterns
-          if (window.FaceMesh && typeof window.FaceMesh === 'function') {
-            FaceMeshClass = window.FaceMesh;
-            console.log('✅ FaceMesh found in window.FaceMesh');
-          } else if (
-            window.mediapipe &&
-            window.mediapipe.FaceMesh &&
-            typeof window.mediapipe.FaceMesh === 'function'
-          ) {
-            FaceMeshClass = window.mediapipe.FaceMesh;
-            console.log('✅ FaceMesh found in window.mediapipe.FaceMesh');
-          } else if (
-            globalThis.FaceMesh &&
-            typeof globalThis.FaceMesh === 'function'
-          ) {
-            FaceMeshClass = globalThis.FaceMesh;
-            console.log('✅ FaceMesh found in globalThis.FaceMesh');
-          }
-        }
+        // Check for FaceMesh in window object (loaded from CDN)
+        const FaceMeshClass =
+          window.FaceMesh ||
+          (window.mediapipe && window.mediapipe.FaceMesh) ||
+          null;
 
         if (!FaceMeshClass || typeof FaceMeshClass !== 'function') {
-          // Detailed logging for debugging
-          console.error('=== FaceMesh Module Debug ===');
-          console.error('Module keys:', Object.keys(FaceMeshModule));
-          console.error('Has default:', !!FaceMeshModule.default);
-          console.error('Default type:', typeof FaceMeshModule.default);
-
-          // Check global scope
-          console.error(
-            'Window.FaceMesh:',
-            typeof window !== 'undefined' ? typeof window.FaceMesh : 'N/A'
-          );
-          console.error(
-            'globalThis.FaceMesh:',
-            typeof globalThis !== 'undefined'
-              ? typeof globalThis.FaceMesh
-              : 'N/A'
-          );
-          if (typeof window !== 'undefined' && window.mediapipe) {
-            console.error(
-              'window.mediapipe keys:',
-              Object.keys(window.mediapipe)
-            );
-            console.error(
-              'window.mediapipe.FaceMesh:',
-              typeof window.mediapipe.FaceMesh
-            );
-          }
-
-          if (
-            FaceMeshModule.default &&
-            typeof FaceMeshModule.default === 'object'
-          ) {
-            console.error(
-              'Default object keys:',
-              Object.keys(FaceMeshModule.default)
-            );
-            console.error(
-              'Default own property names:',
-              Object.getOwnPropertyNames(FaceMeshModule.default)
-            );
-
-            // Find all function properties
-            const functionProps = Object.getOwnPropertyNames(
-              FaceMeshModule.default
-            ).filter(
-              (key) => typeof FaceMeshModule.default[key] === 'function'
-            );
-            console.error('Function properties in default:', functionProps);
-
-            // List all properties
-            const allProps = Object.getOwnPropertyNames(
-              FaceMeshModule.default
-            ).map((key) => ({
-              key,
-              type: typeof FaceMeshModule.default[key],
-              isFunction: typeof FaceMeshModule.default[key] === 'function',
-              name:
-                typeof FaceMeshModule.default[key] === 'function'
-                  ? FaceMeshModule.default[key].name || 'anonymous'
-                  : undefined
-            }));
-            console.error('All default properties:', allProps);
-          }
-
-          console.error('Full module structure:', FaceMeshModule);
-          console.error('=== End Debug ===');
-
           throw new Error(
-            'FaceMesh constructor not found. Available keys: ' +
-              Object.keys(FaceMeshModule || {}).join(', ')
+            'FaceMesh constructor not found in window object. Available keys: ' +
+              Object.keys(window || {}).join(', ')
           );
         }
 
@@ -566,7 +476,18 @@ function CameraView({ onFaceData, isTracking }) {
       console.log('🎥 Creating camera with video element:', videoRef.current);
 
       // ⭐ Bump camera resolution and process every 2nd frame
-      cameraRef.current = new Camera(videoRef.current, {
+      // Check for Camera in window object (loaded from CDN)
+      const CameraClass =
+        window.Camera || (window.mediapipe && window.mediapipe.Camera) || null;
+
+      if (!CameraClass || typeof CameraClass !== 'function') {
+        throw new Error(
+          'Camera constructor not found in window object. Available keys: ' +
+            Object.keys(window || {}).join(', ')
+        );
+      }
+
+      cameraRef.current = new CameraClass(videoRef.current, {
         width: 640,
         height: 480,
         onFrame: async () => {
