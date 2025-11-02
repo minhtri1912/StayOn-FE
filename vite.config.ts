@@ -11,5 +11,15 @@ export default defineConfig({
   },
   server: {
     port: 3000
+  },
+  optimizeDeps: {
+    include: ['@mediapipe/face_mesh', '@mediapipe/camera_utils'],
+    exclude: []
+  },
+  build: {
+    commonjsOptions: {
+      include: [/node_modules/],
+      transformMixedEsModules: true
+    }
   }
 });
