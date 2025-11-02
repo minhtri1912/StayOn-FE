@@ -351,59 +351,90 @@ function CameraView({ onFaceData, isTracking }) {
         return;
       }
 
-      // Initialize FaceMesh - handle default export (runtime shows "Available keys: default")
+      // Initialize FaceMesh with dynamic import
       let faceMesh;
       try {
-        // Import module - runtime console shows only "default" key available
+        // Try destructuring first (simplest approach)
         const FaceMeshModule = await import('@mediapipe/face_mesh');
-
-        // Try to get FaceMesh from default export
-        // Default export could be the FaceMesh class itself or an object containing FaceMesh
         let FaceMeshClass = null;
 
-        if (FaceMeshModule.default) {
-          // Check if default is the FaceMesh class itself
+        // First try: named export (destructuring)
+        try {
+          const { FaceMesh } = FaceMeshModule;
+          if (FaceMesh && typeof FaceMesh === 'function') {
+            FaceMeshClass = FaceMesh;
+            console.log('✅ FaceMesh found via named export');
+          }
+        } catch (e) {
+          // Named export not available, try default
+        }
+
+        // Second try: default export patterns
+        if (!FaceMeshClass && FaceMeshModule.default) {
           if (typeof FaceMeshModule.default === 'function') {
             FaceMeshClass = FaceMeshModule.default;
-          }
-          // Or if default is an object containing FaceMesh
-          else if (
+            console.log('✅ FaceMesh found as default function');
+          } else if (
             FaceMeshModule.default.FaceMesh &&
             typeof FaceMeshModule.default.FaceMesh === 'function'
           ) {
             FaceMeshClass = FaceMeshModule.default.FaceMesh;
-          }
-          // Or if default has constructor property
-          else if (
-            FaceMeshModule.default.constructor &&
-            FaceMeshModule.default.constructor.name === 'FaceMesh'
+            console.log('✅ FaceMesh found in default.FaceMesh');
+          } else if (
+            FaceMeshModule.default.default &&
+            typeof FaceMeshModule.default.default === 'function'
           ) {
-            FaceMeshClass = FaceMeshModule.default.constructor;
+            FaceMeshClass = FaceMeshModule.default.default;
+            console.log('✅ FaceMesh found in default.default');
           }
-        }
-
-        // Fallback: try named export (though runtime shows it's not available)
-        if (
-          !FaceMeshClass &&
-          FaceMeshModule.FaceMesh &&
-          typeof FaceMeshModule.FaceMesh === 'function'
-        ) {
-          FaceMeshClass = FaceMeshModule.FaceMesh;
         }
 
         if (!FaceMeshClass || typeof FaceMeshClass !== 'function') {
-          console.error('FaceMesh module structure:', {
-            keys: Object.keys(FaceMeshModule),
-            hasDefault: !!FaceMeshModule.default,
-            defaultType: typeof FaceMeshModule.default,
-            defaultKeys:
-              FaceMeshModule.default &&
-              typeof FaceMeshModule.default === 'object'
-                ? Object.keys(FaceMeshModule.default)
-                : [],
-            defaultConstructor: FaceMeshModule.default?.constructor?.name,
-            module: FaceMeshModule
-          });
+          // Detailed logging for debugging
+          console.error('=== FaceMesh Module Debug ===');
+          console.error('Module keys:', Object.keys(FaceMeshModule));
+          console.error('Has default:', !!FaceMeshModule.default);
+          console.error('Default type:', typeof FaceMeshModule.default);
+
+          if (
+            FaceMeshModule.default &&
+            typeof FaceMeshModule.default === 'object'
+          ) {
+            console.error(
+              'Default object keys:',
+              Object.keys(FaceMeshModule.default)
+            );
+            console.error(
+              'Default own property names:',
+              Object.getOwnPropertyNames(FaceMeshModule.default)
+            );
+
+            // Find all function properties
+            const functionProps = Object.getOwnPropertyNames(
+              FaceMeshModule.default
+            ).filter(
+              (key) => typeof FaceMeshModule.default[key] === 'function'
+            );
+            console.error('Function properties in default:', functionProps);
+
+            // List all properties
+            const allProps = Object.getOwnPropertyNames(
+              FaceMeshModule.default
+            ).map((key) => ({
+              key,
+              type: typeof FaceMeshModule.default[key],
+              isFunction: typeof FaceMeshModule.default[key] === 'function',
+              name:
+                typeof FaceMeshModule.default[key] === 'function'
+                  ? FaceMeshModule.default[key].name || 'anonymous'
+                  : undefined
+            }));
+            console.error('All default properties:', allProps);
+          }
+
+          console.error('Full module structure:', FaceMeshModule);
+          console.error('=== End Debug ===');
+
           throw new Error(
             'FaceMesh constructor not found. Available keys: ' +
               Object.keys(FaceMeshModule || {}).join(', ')
@@ -414,6 +445,8 @@ function CameraView({ onFaceData, isTracking }) {
           locateFile: (f) =>
             `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${f}`
         });
+
+        console.log('✅ FaceMesh initialized successfully');
       } catch (error) {
         console.error('Failed to initialize FaceMesh:', error);
         setError(`FaceMesh initialization failed: ${error.message}`);
