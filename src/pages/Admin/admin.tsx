@@ -7,8 +7,6 @@ import { useNavigate } from 'react-router-dom';
 import {
   BarChart,
   Bar,
-  LineChart,
-  Line,
   PieChart,
   Pie,
   Cell,
@@ -30,8 +28,6 @@ import {
   Activity
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { RootState } from '@/redux/store';
 import { getRoleFromToken } from '@/helpers/jwt';
 import helper from '@/helpers/index';
 import {
@@ -55,7 +51,6 @@ const COLORS = [
 export default function AdminHome() {
   const { data: stats, isLoading } = useAdminDashboardStats();
   const navigate = useNavigate();
-  const authState = useSelector((state: RootState) => state.auth);
   const currentYear = new Date().getFullYear();
   const [selectedYear, setSelectedYear] = useState(currentYear);
 

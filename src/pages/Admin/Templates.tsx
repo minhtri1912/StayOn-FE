@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { FileText, Plus, Edit, Trash2, Image as ImageIcon } from 'lucide-react';
+import { FileText, Plus, Edit, Trash2 } from 'lucide-react';
 import {
   Dialog,
   DialogContent,

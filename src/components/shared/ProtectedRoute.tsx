@@ -51,8 +51,6 @@ export default function ProtectedRoute({
   // Get role from state or token (prioritize state after initialization)
   const currentRole =
     authState.role || (token ? getRoleFromToken(token) : null);
-  const currentUserId =
-    authState.userId || (token ? getUserIdFromToken(token) : null);
 
   // If no role requirement, allow access
   if (!requiredRole) {
