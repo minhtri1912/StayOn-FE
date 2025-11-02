@@ -351,42 +351,69 @@ function CameraView({ onFaceData, isTracking }) {
         return;
       }
 
-      // Initialize FaceMesh - use named import as per TypeScript definitions
+      // Initialize FaceMesh - handle default export (runtime shows "Available keys: default")
       let faceMesh;
       try {
-        // Import FaceMesh as a named export (matches index.d.ts: export declare class FaceMesh)
-        const { FaceMesh: FaceMeshClass } = await import(
-          '@mediapipe/face_mesh'
-        );
+        // Import module - runtime console shows only "default" key available
+        const FaceMeshModule = await import('@mediapipe/face_mesh');
+
+        // Try to get FaceMesh from default export
+        // Default export could be the FaceMesh class itself or an object containing FaceMesh
+        let FaceMeshClass = null;
+
+        if (FaceMeshModule.default) {
+          // Check if default is the FaceMesh class itself
+          if (typeof FaceMeshModule.default === 'function') {
+            FaceMeshClass = FaceMeshModule.default;
+          }
+          // Or if default is an object containing FaceMesh
+          else if (
+            FaceMeshModule.default.FaceMesh &&
+            typeof FaceMeshModule.default.FaceMesh === 'function'
+          ) {
+            FaceMeshClass = FaceMeshModule.default.FaceMesh;
+          }
+          // Or if default has constructor property
+          else if (
+            FaceMeshModule.default.constructor &&
+            FaceMeshModule.default.constructor.name === 'FaceMesh'
+          ) {
+            FaceMeshClass = FaceMeshModule.default.constructor;
+          }
+        }
+
+        // Fallback: try named export (though runtime shows it's not available)
+        if (
+          !FaceMeshClass &&
+          FaceMeshModule.FaceMesh &&
+          typeof FaceMeshModule.FaceMesh === 'function'
+        ) {
+          FaceMeshClass = FaceMeshModule.FaceMesh;
+        }
 
         if (!FaceMeshClass || typeof FaceMeshClass !== 'function') {
-          // Fallback: try default import
-          const module = await import('@mediapipe/face_mesh');
-          const FallbackFaceMesh = module.default || module.FaceMesh || module;
-
-          if (!FallbackFaceMesh || typeof FallbackFaceMesh !== 'function') {
-            console.error('FaceMesh module structure:', {
-              keys: Object.keys(module),
-              hasDefault: !!module.default,
-              hasFaceMesh: !!module.FaceMesh,
-              module: module
-            });
-            throw new Error(
-              'FaceMesh constructor not found. Available keys: ' +
-                Object.keys(module || {}).join(', ')
-            );
-          }
-
-          faceMesh = new FallbackFaceMesh({
-            locateFile: (f) =>
-              `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${f}`
+          console.error('FaceMesh module structure:', {
+            keys: Object.keys(FaceMeshModule),
+            hasDefault: !!FaceMeshModule.default,
+            defaultType: typeof FaceMeshModule.default,
+            defaultKeys:
+              FaceMeshModule.default &&
+              typeof FaceMeshModule.default === 'object'
+                ? Object.keys(FaceMeshModule.default)
+                : [],
+            defaultConstructor: FaceMeshModule.default?.constructor?.name,
+            module: FaceMeshModule
           });
-        } else {
-          faceMesh = new FaceMeshClass({
-            locateFile: (f) =>
-              `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${f}`
-          });
+          throw new Error(
+            'FaceMesh constructor not found. Available keys: ' +
+              Object.keys(FaceMeshModule || {}).join(', ')
+          );
         }
+
+        faceMesh = new FaceMeshClass({
+          locateFile: (f) =>
+            `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${f}`
+        });
       } catch (error) {
         console.error('Failed to initialize FaceMesh:', error);
         setError(`FaceMesh initialization failed: ${error.message}`);
