@@ -403,12 +403,56 @@ function CameraView({ onFaceData, isTracking }) {
           }
         }
 
+        // Check global scope (MediaPipe may expose FaceMesh globally)
+        if (!FaceMeshClass && typeof window !== 'undefined') {
+          // Check various global patterns
+          if (window.FaceMesh && typeof window.FaceMesh === 'function') {
+            FaceMeshClass = window.FaceMesh;
+            console.log('✅ FaceMesh found in window.FaceMesh');
+          } else if (
+            window.mediapipe &&
+            window.mediapipe.FaceMesh &&
+            typeof window.mediapipe.FaceMesh === 'function'
+          ) {
+            FaceMeshClass = window.mediapipe.FaceMesh;
+            console.log('✅ FaceMesh found in window.mediapipe.FaceMesh');
+          } else if (
+            globalThis.FaceMesh &&
+            typeof globalThis.FaceMesh === 'function'
+          ) {
+            FaceMeshClass = globalThis.FaceMesh;
+            console.log('✅ FaceMesh found in globalThis.FaceMesh');
+          }
+        }
+
         if (!FaceMeshClass || typeof FaceMeshClass !== 'function') {
           // Detailed logging for debugging
           console.error('=== FaceMesh Module Debug ===');
           console.error('Module keys:', Object.keys(FaceMeshModule));
           console.error('Has default:', !!FaceMeshModule.default);
           console.error('Default type:', typeof FaceMeshModule.default);
+
+          // Check global scope
+          console.error(
+            'Window.FaceMesh:',
+            typeof window !== 'undefined' ? typeof window.FaceMesh : 'N/A'
+          );
+          console.error(
+            'globalThis.FaceMesh:',
+            typeof globalThis !== 'undefined'
+              ? typeof globalThis.FaceMesh
+              : 'N/A'
+          );
+          if (typeof window !== 'undefined' && window.mediapipe) {
+            console.error(
+              'window.mediapipe keys:',
+              Object.keys(window.mediapipe)
+            );
+            console.error(
+              'window.mediapipe.FaceMesh:',
+              typeof window.mediapipe.FaceMesh
+            );
+          }
 
           if (
             FaceMeshModule.default &&
